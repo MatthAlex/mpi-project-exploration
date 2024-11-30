@@ -1,8 +1,12 @@
-# Fortran Project Template
+# Fortran MPI exploration
 
-Modern Fortran development made simple - an opinionated, batteries-included project template that brings contemporary development practices to Fortran projects.
+Let's explore a simple MPI cartesian grid with halo region updates, `mpi_f08`, `havaita`, some clever encapsulation, and general project structure and architecture.
 
-- [Why This Template?](#why-this-template)
+Some nice to haves:
+- external configuration
+- logging (parallel)
+- testing (parallel)
+
 - [Getting Started](#getting-started)
 - [Code Quality](#code-quality)
 - [Documentation](#documentation)
@@ -12,40 +16,13 @@ Modern Fortran development made simple - an opinionated, batteries-included proj
 - [License](#license)
 - [Appendix](#appendix)
 
-## Why This Template?
-
-Fortran remains a crucial language in scientific computing, engineering, and high-performance computing. However, while the language has modernized significantly, the development workflow often lags behind contemporary software engineering practices. This template bridges that gap by providing:
-
-- modern development features like code completion, automated testing, and documentation generation out of the box.
-- seamless integration of Fortran codebases with modern DevOps practices, including continuous integration, code quality checks, and automated documentation.
-- IDE-like tooling integration with VS Code and extensions.
-
-### Key Benefits
-
-- 🚀 **Instant Modern Setup**: Get a fully configured development environment in minutes, not days
-- 🔍 **Code Intelligence**: Real-time error detection, code completion, and refactoring support via VS Code integration
-- 📊 **Quality Assurance**: Automated testing, formatting, and linting integrated with git workflow
-- 📚 **Automated Documentation**: Generate professional documentation from your code comments
-- 🛠️ **Best Practices Built-in**: Pre-configured tools enforce consistent code style and quality
-- 🔄 **Modern Workflow**: Brings git-based workflow, dependency management, and automated builds to Fortran
-
-### Traditional vs Modern Fortran Development
-
-| Aspect | Traditional Approach | With This Template |
-|--------|---------------------|-------------------|
-| Setup Time | Hours/days configuring tools | Minutes with pre-configured environment |
-| Error Detection | At compile time | Real-time as you type |
-| Code Style | Manual enforcement | Automated formatting and checks |
-| Documentation | Manual maintenance | Generated from code comments |
-| Testing | Often manual or ad-hoc | Automated with each commit |
-| Dependencies | Manual management | Handled by package manager |
-
 ## Getting Started
 
 ### Prerequisites
 
 - Linux OS or WSL2 via Windows
 - GFortran or oneAPI Fortran compiler
+- MPI/MPICH installation. Currently testing on OpenMPI v5.0.2
 
 #### Optional
 
@@ -57,19 +34,17 @@ Fortran remains a crucial language in scientific computing, engineering, and hig
 0. Load compiler modules (if on a compute cluster):
 
     ```sh
-    module load gcc
+    module load gcc openmpi
     # or
-    module load intel
+    module load intel intelmpi
     ```
 
 1. Create and activate a Python environment:
 
     ```sh
     python3 -m venv .venv
-    source .venv/bin/activate
+    source .venv/bin/activate  # Remember to activate your enviroment before runtime or development tasks.
     ```
-
-    Remember to activate your enviroment before runtime or development tasks.
 
 2. Install the runtime and development packages:
 
@@ -82,16 +57,12 @@ Fortran remains a crucial language in scientific computing, engineering, and hig
 
     ```sh
     fpm test  # by default it uses gcc/gfortran to compile and run
-    fpm run
+    fpm run mpi
     ```
-
-4. Migrate your project:
-
-    See a step-by-step guide on how to [migrate your project](./docs/MIGRATION.md).
 
 ## Code Quality
 
-This template integrates several tools to maintain high code quality:
+The template used integrates several tools to maintain high code quality:
 
 ### IDE Integration
 
@@ -136,7 +107,7 @@ Contributions from the community are welcome. To contribute, consider opening an
 
 ## Contact
 
-For questions or suggestions, please contact us at [email](m.alexandrakis@qmul.ac.uk) or open an issue.
+For questions or suggestions, please contact me at [email](matt.alexandrakis@gmail.com) or open an issue.
 
 ## License
 
@@ -174,8 +145,7 @@ $ tree -Ia '__pycache__|.git|.pytest_cache|.venv|build|.gen*|ford'
 
 ### References and Links
 
-This repository takes a lot of inspiration (and actual code) from [easy](https://github.com/urbanjost/easy).
-
+- [template](https://github.com/MatthAlex/fortran-project-template)
 - [`fpm`](https://github.com/fortran-lang/fpm)
 - [Modern Fortran extension](https://github.com/fortran-lang/vscode-fortran-support)
 - [`fortls`](https://github.com/fortran-lang/fortls)

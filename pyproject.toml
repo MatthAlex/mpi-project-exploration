@@ -1,7 +1,7 @@
 [project]
-name = "fortran-project-template"
+name = "mpi-project-exploration"
 version = "2024.0.1"
-description = "An opinionated one-stop shop for new and old Fortran projects, offering seamless compiling, building, packaging, linting, formatting, and more, with modern tools like FPM, pre-commit, fprettify, and ford."
+description = "A simple Fortran MPI project to explore ideas."
 dependencies = [
     "fpm",
     "ford",
@@ -17,6 +17,7 @@ keywords = ["fortran", "modern fortran", "mpi", "vscode"]
 classifiers = [
   "Development Status :: 4 - Beta",
   "Programming Language :: Python",
+  "Programming Language :: Fortran",
 ]
 
 [project.optional-dependencies]
@@ -28,8 +29,8 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/MatthAlex/fortran-project-template"
-Documentation = "https://github.com/MatthAlex/fortran-project-template/README.md"
-Repository = "https://github.com/MatthAlex/fortran-project-template"
-"Bug Tracker" = "https://github.com/MatthAlex/fortran-project-template/issues"
-Changelog = "https://github.com/MatthAlex/fortran-project-template/master/CHANGELOG.md"
+Homepage = "https://github.com/MatthAlex/mpi-project-exploration"
+Documentation = "https://github.com/MatthAlex/mpi-project-exploration/README.md"
+Repository = "https://github.com/MatthAlex/mpi-project-exploration"
+"Bug Tracker" = "https://github.com/MatthAlex/mpi-project-exploration/issues"
+Changelog = "https://github.com/MatthAlex/mpi-project-exploration/master/CHANGELOG.md"

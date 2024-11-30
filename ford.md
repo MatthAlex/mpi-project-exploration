@@ -1,10 +1,10 @@
 ---
-project: Sample
-summary: Fortran Project Template
-author: Your Name
+project: mpi
+summary: Fortran MPI project
+author: Matthew Alexandrakis
 website: https://blog.hpc.qmul.ac.uk/using-ford/
 twitter: https://x.com/
-github: https://github.com/MatthAlex/fortran-project-template
+github: https://github.com/MatthAlex/mpi-project-exploration
 src_dir: ./src
          ./app
 output_dir: ./docs/ford
