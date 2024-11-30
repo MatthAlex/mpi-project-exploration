@@ -2,10 +2,7 @@
 
 Let's explore a simple MPI cartesian grid with halo region updates, `mpi_f08`, `havaita`, some clever encapsulation, and general project structure and architecture.
 
-Some nice to haves:
-- external configuration
-- logging (parallel)
-- testing (parallel)
+Some nice-to-haves are external configuration, logging (parallel), testing (parallel).
 
 - [Getting Started](#getting-started)
 - [Code Quality](#code-quality)
