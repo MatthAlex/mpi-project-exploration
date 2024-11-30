@@ -1,0 +1,35 @@
+[project]
+name = "fortran-project-template"
+version = "2024.0.1"
+description = "An opinionated one-stop shop for new and old Fortran projects, offering seamless compiling, building, packaging, linting, formatting, and more, with modern tools like FPM, pre-commit, fprettify, and ford."
+dependencies = [
+    "fpm",
+    "ford",
+    "graphviz",
+]
+requires-python = ">=3.8"
+authors = [
+  { name = "Your name", email = "your@email.com" },
+]
+readme = "README.md"
+license = { file = "LICENSE" }
+keywords = ["fortran", "modern fortran", "mpi", "vscode"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Programming Language :: Python",
+]
+
+[project.optional-dependencies]
+dev = [
+    "fortls",
+    "fprettify",
+    "pre-commit",
+    "fortitude-lint",
+]
+
+[project.urls]
+Homepage = "https://github.com/MatthAlex/fortran-project-template"
+Documentation = "https://github.com/MatthAlex/fortran-project-template/README.md"
+Repository = "https://github.com/MatthAlex/fortran-project-template"
+"Bug Tracker" = "https://github.com/MatthAlex/fortran-project-template/issues"
+Changelog = "https://github.com/MatthAlex/fortran-project-template/master/CHANGELOG.md"
