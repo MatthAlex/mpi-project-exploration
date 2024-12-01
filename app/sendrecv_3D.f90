@@ -6,7 +6,7 @@
 program sendrecv_3D
    use mpi
    use grid_module, only: initialize_MPI_grid, rank => my_rank
-   use lib_parameters, only: num_cells, iterations
+   use lib_parameters, only: nx => num_cells_x, ny => num_cells_y, nz => num_cells_z, iterations
    use lib_mpi_halo, only: update_mpi_halo
    implicit none
 
@@ -17,7 +17,7 @@ program sendrecv_3D
    call initialize_MPI_grid()
 
    ! Create a local array with halo regions
-   allocate (array(0:num_cells + 1, 0:num_cells + 1, 0:num_cells + 1), source=real(rank, kind=4))
+   allocate (array(0:nx + 1, 0:ny + 1, 0:nz + 1), source=real(rank, kind=4))
 
    do i = 1, iterations
 
