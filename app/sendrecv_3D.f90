@@ -2,55 +2,26 @@
 !> - It leaves the topology generation to MPI
 !> - Can handle periodic boundaries with a boolean flag
 !> - Heuristics may reorder the original comm (CPU topology) into a more efficient one
-!> - Figures out who are the neighbours of each rank automatically
+!> - Figures out who the neighbours are of each rank automatically
 program sendrecv_3D
    use mpi
+   use grid_module, only: initialize_MPI_grid, &
+      left => west, right => east, down => south, up => north, back => low, front => high, &
+      comm_cart, rank => my_rank
    implicit none
 
-   integer :: ierr, rank, comsize, comm
-   integer :: ndims, dim_size(3), coords(3)
-   logical :: periodic(1:3), reorder
-   integer :: left, right, up, down, front, back
-   integer :: comm_cart
+   integer :: ierr
    integer :: status(MPI_STATUS_SIZE)
    real(kind=4), allocatable :: array(:, :, :)
    integer :: num_cells
    integer :: tag
    integer :: i
 
-   call MPI_Init(ierr)
-   comm = MPI_COMM_WORLD
-   call MPI_Comm_size(comm, comsize, ierr)
-   call MPI_Comm_rank(comm, rank, ierr)
-
-   ! Dimensions of the Cartesian grid (3D)
-   ndims = 3
-   ! Let MPI_Dims_create decide the dimensions automatically
-   dim_size = [0, 0, 0]
-
-   call MPI_Dims_create(comsize, ndims, dim_size, ierr)
-
-   ! Enable/disable periodic boundary conditions
-   periodic(1) = .false. ! X
-   periodic(2) = .false. ! Y
-   periodic(3) = .false. ! Z
-   ! If MPI can find a better topology, it can reorder the original Comm
-   reorder = .true.
-
-   ! Create the Cartesian communicator
-   call MPI_Cart_create(comm, ndims, dim_size, periodic, reorder, comm_cart, ierr)
-
-   ! Get the coordinates of this process in the grid
-   call MPI_Cart_coords(comm_cart, rank, ndims, coords, ierr)
+   call initialize_MPI_grid()
 
    ! Create a local array with halo regions
    num_cells = 1
    allocate (array(0:num_cells + 1, 0:num_cells + 1, 0:num_cells + 1), source=real(rank, kind=4))
-
-   ! Compute the neighbors in each direction
-   call MPI_Cart_shift(comm_cart, 0, 1, left, right, ierr) ! X direction neighbors
-   call MPI_Cart_shift(comm_cart, 1, 1, down, up, ierr) ! Y direction neighbors
-   call MPI_Cart_shift(comm_cart, 2, 1, back, front, ierr) ! Z direction neighbors
 
    tag = 1
 
