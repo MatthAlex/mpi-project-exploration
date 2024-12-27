@@ -27,21 +27,21 @@ program simple_mpi_f08
    if (right >= size) right = 0
 
    ! Print information about this process
-   print '(a,i0,a,i0,a,1x,i0,1x,i0)', 'Hello from process ', rank, ' of ', size, ". My neighbours are:", left, right
+   print '(3(a,1x,i0),1x,i0)', 'Hello from process ', rank, ' of ', size, ". My neighbours are:", left, right
 
    ! Data to send is the rank of the current process
    sendval = rank
 
    ! Perform Sendrecv operation: send rank to right neighbor, receive from left neighbor
-   call MPI_Sendrecv(sendval, 1, MPI_INTEGER, right, TAG, & ! Send to right
-                     recvval, 1, MPI_INTEGER, left, TAG, &  ! Receive from left
+   call MPI_Sendrecv(sendval, 1, MPI_INTEGER, right, tag, & ! Send to right
+                     recvval, 1, MPI_INTEGER, left, tag, &  ! Receive from left
                      MPI_COMM_WORLD, status, ierr)
    if (ierr /= MPI_SUCCESS) error stop "Sendrecv failed"
    if (recvval /= left) error stop "Wrong value received from left"
 
 ! Perform Sendrecv operation: send rank to left neighbor, receive from right neighbor
-   call MPI_Sendrecv(sendval, 1, MPI_INTEGER, left, TAG, & ! Send to left
-                     recvval, 1, MPI_INTEGER, right, TAG, &  ! Receive from right
+   call MPI_Sendrecv(sendval, 1, MPI_INTEGER, left, tag, & ! Send to left
+                     recvval, 1, MPI_INTEGER, right, tag, &  ! Receive from right
                      MPI_COMM_WORLD, status, ierr)
    if (ierr /= MPI_SUCCESS) error stop "Sendrecv failed"
    if (recvval /= right) error stop "Wrong value received from right"

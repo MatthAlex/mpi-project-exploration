@@ -40,5 +40,8 @@ program sendrecv_1D
    if (int(array_halo_exchange(0)) /= left) error stop "Left halo cell not updated correctly"
    if (int(array_halo_exchange(num_cells + 1)) /= right) error stop "Right halo cell not updated correctly"
 
+   ! Given the tests above have passed
+   if (rank == 0) print*, "Success!"
+
    call MPI_Finalize(ierr)
 end program sendrecv_1D

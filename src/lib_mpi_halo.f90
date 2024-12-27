@@ -1,7 +1,7 @@
 !> Encapsulates MPI halo update functionality
 !> - static transfer buffers - avoid allocation every update
 !> - module procedure to generalise subroutine calling
-!> TODO: assumes cube of num_cells size
+!> - independent dimensionality
 module lib_mpi_halo
    use mpi
    use grid_module, only: west, east, south, north, low, high, comm_cart

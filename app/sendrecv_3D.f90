@@ -14,6 +14,7 @@ program sendrecv_3D
    real(kind=4), allocatable :: array(:, :, :)
    integer :: i
 
+   call MPI_Init(ierr)
    call initialize_MPI_grid()
 
    ! Create a local array with halo regions
@@ -24,6 +25,9 @@ program sendrecv_3D
       call update_mpi_halo(array=array)
 
    end do
+
+   ! Since the tests above pass
+   if (rank == 0) print*, "Success!"
 
    call MPI_Finalize(ierr)
 
