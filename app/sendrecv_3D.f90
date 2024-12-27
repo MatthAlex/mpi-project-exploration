@@ -8,6 +8,7 @@ program sendrecv_3D
    use grid_module, only: initialize_MPI_grid, rank => my_rank
    use lib_parameters, only: nx => num_cells_x, ny => num_cells_y, nz => num_cells_z, iterations
    use lib_mpi_halo, only: update_mpi_halo
+   use checks, only: check_halo_real
    implicit none
 
    integer :: ierr
@@ -24,6 +25,7 @@ program sendrecv_3D
 
       call update_mpi_halo(array=array)
 
+      call check_halo_real(array=array)
    end do
 
    ! Since the tests above pass
