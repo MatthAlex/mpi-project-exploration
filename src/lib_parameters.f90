@@ -7,4 +7,7 @@ module lib_parameters
    integer, parameter :: num_cells_z = num_cells+3
 
    integer, parameter :: iterations = 2
+
+   !> 0 is Periodic, 1 is Dirichlet, 2 is Neumann
+   integer, parameter :: boundaries(6) = [1, 1, 2, 2, 0, 0]
 end module lib_parameters
