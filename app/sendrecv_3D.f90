@@ -9,6 +9,7 @@ program sendrecv_3D
    use lib_parameters, only: nx => num_cells_x, ny => num_cells_y, nz => num_cells_z, iterations
    use lib_mpi_halo, only: update_mpi_halo
    use checks, only: check_halo_real
+   use boundary, only: determine_rank_boundaries
    implicit none
 
    integer :: ierr
@@ -17,6 +18,8 @@ program sendrecv_3D
 
    call MPI_Init(ierr)
    call initialize_MPI_grid()
+
+   call determine_rank_boundaries()
 
    ! Create a local array with halo regions
    allocate (array(0:nx + 1, 0:ny + 1, 0:nz + 1), source=real(rank, kind=4))
