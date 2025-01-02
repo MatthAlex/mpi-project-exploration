@@ -166,3 +166,5 @@ cython_debug/
 .generated_modules
 ## Ford
 docs/ford
+## FPM
+bin/*
