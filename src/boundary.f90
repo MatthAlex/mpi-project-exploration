@@ -7,7 +7,7 @@
 !> - Routines to apply various boundary conditions (Dirichlet, Neumann, etc.)
 module boundary
    use mpi
-   use grid_module, only: west, east, south, north, low, high
+   use grid_module, only: west, east, south, north, low, high, rank => my_rank
    use lib_parameters, only: boundaries, nx => num_cells_x, ny => num_cells_y, nz => num_cells_z
    implicit none
    private
@@ -15,7 +15,7 @@ module boundary
    public :: is_rank_inside, is_bc_face
 
    !> Named constants for the 6 directions in a 3D domain.
-   integer, parameter :: D_WEST = 1, D_EAST = 2, D_SOUTH = 3, D_NORTH = 4, D_LOW = 5, D_HIGH = 6
+   integer, parameter, public :: D_WEST = 1, D_EAST = 2, D_SOUTH = 3, D_NORTH = 4, D_LOW = 5, D_HIGH = 6
 
    !> Module array of neighbor ranks for each of the 6 faces in 3D.
    integer :: neighbor_ranks(6)
@@ -25,6 +25,9 @@ module boundary
 
    !> Indicates if this rank is completely inside (no boundary faces).
    logical :: is_rank_inside
+
+   !> Print verbose debug statements
+   logical, parameter :: DEBUG = .true.
 
 contains
 
@@ -48,6 +51,7 @@ contains
    !> Applies boundary conditions to each boundary face of the local domain,
    !> only when the face belongs to the physical boundary.
    subroutine apply_boundaries(array, bc_types)
+      use lib_parameters, only: dirichlet_value
       real, intent(inout) :: array(:, :, :)
       integer, intent(in) :: bc_types(6)
       integer :: face
@@ -61,7 +65,7 @@ contains
          case (0) ! Periodic is handled by MPI
             cycle
          case (1) ! Dirichlet
-            call apply_dirichlet(array, face, constant_value=1.0)
+            call apply_dirichlet(array, face, constant_value=dirichlet_value)
          case (2) ! Von Neumann
             call apply_neumann(array, face)
          case default ! placeholder
@@ -75,15 +79,27 @@ contains
    subroutine apply_dirichlet(array, face, constant_value)
       real, intent(inout) :: array(:, :, :)
       integer, intent(in) :: face
-      real, intent(in) :: constant_value ! this value could be an array of values
+      real, intent(in) :: constant_value ! this value could be an array of values for each face
 
       select case (face)
-      case (D_WEST); array(1, :, :) = constant_value
-      case (D_EAST); array(ubound(array, 1), :, :) = constant_value
-      case (D_SOUTH); array(:, 1, :) = constant_value
-      case (D_NORTH); array(:, ubound(array, 2), :) = constant_value
-      case (D_LOW); array(:, :, 1) = constant_value
-      case (D_HIGH); array(:, :, ubound(array, 3)) = constant_value
+      case (D_WEST)
+         if (DEBUG) write(*,'(2(A,1X,I0))')"BC DIRICHLET: Updating face", D_WEST, " for rank:", rank
+         array(1, :, :) = constant_value
+      case (D_EAST)
+         if (DEBUG) write(*,'(2(A,1X,I0))')"BC DIRICHLET: Updating face", D_EAST, " for rank:", rank
+         array(ubound(array, 1), :, :) = constant_value
+      case (D_SOUTH)
+         if (DEBUG) write(*,'(2(A,1X,I0))')"BC DIRICHLET: Updating face", D_SOUTH, " for rank:", rank
+         array(:, 1, :) = constant_value
+      case (D_NORTH)
+         if (DEBUG) write(*,'(2(A,1X,I0))')"BC DIRICHLET: Updating face", D_NORTH, " for rank:", rank
+         array(:, ubound(array, 2), :) = constant_value
+      case (D_LOW)
+         if (DEBUG) write(*,'(2(A,1X,I0))')"BC DIRICHLET: Updating face", D_LOW, " for rank:", rank
+         array(:, :, 1) = constant_value
+      case (D_HIGH)
+         if (DEBUG) write(*,'(2(A,1X,I0))')"BC DIRICHLET: Updating face", D_HIGH, " for rank:", rank
+         array(:, :, ubound(array, 3)) = constant_value
       end select
    end subroutine apply_dirichlet
 
