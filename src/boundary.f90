@@ -9,13 +9,11 @@ module boundary
    use mpi
    use grid_module, only: west, east, south, north, low, high, rank => my_rank
    use lib_parameters, only: boundaries, nx => num_cells_x, ny => num_cells_y, nz => num_cells_z
+   use enums, only: D_WEST, D_EAST, D_SOUTH, D_NORTH, D_LOW, D_HIGH, PERIODIC, DIRICHLET, NEUMANN
    implicit none
    private
    public :: determine_rank_boundaries, apply_boundaries
    public :: is_rank_inside, is_bc_face
-
-   !> Named constants for the 6 directions in a 3D domain.
-   integer, parameter, public :: D_WEST = 1, D_EAST = 2, D_SOUTH = 3, D_NORTH = 4, D_LOW = 5, D_HIGH = 6
 
    !> Module array of neighbor ranks for each of the 6 faces in 3D.
    integer :: neighbor_ranks(6)
@@ -62,11 +60,11 @@ contains
          if (.not. is_bc_face(face)) cycle
 
          select case (bc_types(face))
-         case (0) ! Periodic is handled by MPI
+         case (PERIODIC) ! Periodic is handled by MPI
             cycle
-         case (1) ! Dirichlet
+         case (DIRICHLET) ! Dirichlet
             call apply_dirichlet(array, face, constant_value=dirichlet_value)
-         case (2) ! Von Neumann
+         case (NEUMANN) ! Von Neumann
             call apply_neumann(array, face)
          case default ! placeholder
             call apply_custom_bc(array, face)
