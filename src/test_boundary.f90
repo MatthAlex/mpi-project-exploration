@@ -1,4 +1,5 @@
 module test_boundary
+   use precision, only: sp
    use lib_parameters, only: nx => num_cells_x, ny => num_cells_y, nz => num_cells_z, boundaries
    use grid_module, only: west, east, south, north, low, high, rank => my_rank
    use enums, only: D_WEST, D_EAST, D_SOUTH, D_NORTH, D_LOW, D_HIGH, PERIODIC, DIRICHLET, NEUMANN
@@ -15,8 +16,8 @@ contains
    subroutine check_boundary_real(array)
       use boundary, only: is_bc_face
       use lib_parameters, only: dirichlet_value
-      real, dimension(:, :, :), intent(in) :: array
-      real, parameter :: tolerance = 1.0e-10
+      real(kind=sp), dimension(:, :, :), intent(in) :: array
+      real(kind=sp), parameter :: tolerance = 1.0e-10_sp
 
       ! West face
       if (is_bc_face(D_WEST)) then

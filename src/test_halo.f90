@@ -1,4 +1,4 @@
-module checks
+module test_halo
    use lib_parameters, only: nx => num_cells_x, ny => num_cells_y, nz => num_cells_z
    use grid_module, only: west, east, south, north, low, high, rank => my_rank
    implicit none
@@ -31,4 +31,4 @@ contains
       if (any(int(array(1:nx, 1:ny, nz + 1)) /= high .and. .not. is_bc_face(6))) &
          error stop "NOT OK in high"
    end subroutine check_halo_real
-end module checks
+end module test_halo

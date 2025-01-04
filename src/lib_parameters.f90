@@ -1,4 +1,5 @@
 module lib_parameters
+   use precision, only: sp
    use enums, only: PERIODIC, DIRICHLET, NEUMANN
    implicit none
    public
@@ -13,5 +14,5 @@ module lib_parameters
    integer, parameter :: boundaries(6) = [DIRICHLET, DIRICHLET, NEUMANN, NEUMANN, PERIODIC, PERIODIC]
 
    !> Dirichlet Boundary Condition value
-   real, parameter :: dirichlet_value = 1.0
+   real(kind=sp), parameter :: dirichlet_value = -1.0_sp
 end module lib_parameters

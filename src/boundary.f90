@@ -7,6 +7,7 @@
 !> - Routines to apply various boundary conditions (Dirichlet, Neumann, etc.)
 module boundary
    use mpi
+   use precision, only: sp
    use grid_module, only: west, east, south, north, low, high, rank => my_rank
    use lib_parameters, only: boundaries, nx => num_cells_x, ny => num_cells_y, nz => num_cells_z
    use enums, only: D_WEST, D_EAST, D_SOUTH, D_NORTH, D_LOW, D_HIGH, PERIODIC, DIRICHLET, NEUMANN
@@ -50,7 +51,7 @@ contains
    !> only when the face belongs to the physical boundary.
    subroutine apply_boundaries(array, bc_types)
       use lib_parameters, only: dirichlet_value
-      real, intent(inout) :: array(:, :, :)
+      real(kind=sp), intent(inout) :: array(:, :, :)
       integer, intent(in) :: bc_types(6)
       integer :: face
 
@@ -75,7 +76,7 @@ contains
 
    !> Applies a Dirichlet boundary condition by setting boundary cells to a constant.
    subroutine apply_dirichlet(array, face, constant_value)
-      real, intent(inout) :: array(:, :, :)
+      real(kind=sp), intent(inout) :: array(:, :, :)
       integer, intent(in) :: face
       real, intent(in) :: constant_value ! this value could be an array of values for each face
 
