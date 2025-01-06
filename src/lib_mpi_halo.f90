@@ -3,14 +3,15 @@
 !> - module procedure to generalise subroutine calling
 !> - independent dimensionality
 module lib_mpi_halo
-   use mpi
+   use mpi, only: MPI_Sendrecv, MPI_STATUS_SIZE, MPI_REAL, MPI_INTEGER
    use precision, only: sp
    use grid_module, only: west, east, south, north, low, high, comm_cart
    use lib_parameters, only: nx => num_cells_x, ny => num_cells_y, nz => num_cells_z
    implicit none
+   private
    public :: update_mpi_halo
 
-   integer :: ierr, rank, comm
+   integer :: ierr
    integer :: status(MPI_STATUS_SIZE)
 
    !> Buffers for integer transfers - avoids allocation

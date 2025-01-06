@@ -4,7 +4,7 @@
 !> - Heuristics may reorder the original comm (CPU topology) into a more efficient one
 !> - Figures out who the neighbours are of each rank automatically
 program sendrecv_3D
-   use mpi
+   use mpi, only: MPI_Init, MPI_Barrier, MPI_Finalize
    use precision, only: sp
    use grid_module, only: initialize_MPI_grid, rank => my_rank, comm_cart
    use lib_parameters, only: nx => num_cells_x, ny => num_cells_y, nz => num_cells_z, iterations

@@ -1,5 +1,6 @@
 program simple_mpi_f08
-   use mpi_f08
+   use mpi_f08, only: MPI_Init, MPI_SUCCESS, MPI_COMM_WORLD, MPI_Status, MPI_Sendrecv, MPI_INTEGER
+   use mpi_f08, only: MPI_Comm_size, MPI_Comm_rank
    implicit none
 
    integer :: ierr

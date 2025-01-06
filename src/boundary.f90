@@ -6,7 +6,7 @@
 !> - Routines to determine which faces belong to physical domain boundaries
 !> - Routines to apply various boundary conditions (Dirichlet, Neumann, etc.)
 module boundary
-   use mpi
+   use mpi, only: MPI_PROC_NULL, MPI_Finalize
    use precision, only: sp
    use grid_module, only: west, east, south, north, low, high, rank => my_rank
    use lib_parameters, only: boundaries, nx => num_cells_x, ny => num_cells_y, nz => num_cells_z

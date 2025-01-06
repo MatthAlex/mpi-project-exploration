@@ -1,5 +1,6 @@
 module grid_module
-   use mpi
+   use mpi, only: MPI_Cart_coords, MPI_Cart_create, MPI_Cart_shift, MPI_Comm_rank, MPI_Comm_size, MPI_Dims_create
+   use mpi, only: MPI_COMM_WORLD, MPI_SUCCESS
    implicit none
    private
    public :: initialize_MPI_grid
@@ -22,7 +23,7 @@ module grid_module
    integer, public :: west, east, north, south, low, high
    !> Cartesian MPI communicator
    integer, public :: comm_cart
-   !> Cartesian MPI coordinates
+   !> Cartesian MPI coordinates. Coordinates are 0-based.
    integer, public :: my_coordinates(ndims)
 
 contains
