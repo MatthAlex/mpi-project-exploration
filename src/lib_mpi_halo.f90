@@ -9,7 +9,7 @@ module lib_mpi_halo
    use lib_parameters, only: nx => num_cells_x, ny => num_cells_y, nz => num_cells_z
    implicit none
    private
-   public :: update_mpi_halo
+   public :: update_mpi_halo, init_arrays
 
    integer :: ierr
    integer :: status(MPI_STATUS_SIZE)
@@ -20,9 +20,8 @@ module lib_mpi_halo
    integer, dimension(nx + 2, ny + 2) :: buffer_send_z_int, buffer_rcv_z_int
 
    !> Buffers for real transfers - avoids allocation
-   real(kind=sp), dimension(ny + 2, nz + 2) :: buffer_send_x, buffer_rcv_x
-   real(kind=sp), dimension(nx + 2, nz + 2) :: buffer_send_y, buffer_rcv_y
-   real(kind=sp), dimension(nx + 2, ny + 2) :: buffer_send_z, buffer_rcv_z
+   real(kind=sp), allocatable :: buffer_send_x(:,:), buffer_rcv_x(:,:)
+   real(kind=sp), allocatable :: buffer_send_y(:,:), buffer_rcv_y(:,:)
 
    !> Direction face-surface sizes
    integer, parameter :: X_FACE_SIZE = (ny + 2) * (nz + 2)
@@ -37,6 +36,11 @@ module lib_mpi_halo
    end interface
 
 contains
+
+   subroutine init_arrays()
+      allocate (buffer_send_x(ny + 2, nz + 2), buffer_rcv_x(ny + 2, nz + 2))
+      allocate (buffer_send_y(nx + 2, nz + 2), buffer_rcv_y(nx + 2, nz + 2))
+   end subroutine init_arrays
 
    !> Perform halo exchanges in all 3 directions for a REAL array
    subroutine update_mpi_halo_real(array)
@@ -57,11 +61,9 @@ contains
       array(:, 0, :) = buffer_rcv_y
 
       ! Exchange Z direction; I send High halo to High neighbour, I receive Low halo from Low Neighbour
-      buffer_send_z = array(:, :, nz)
-      call MPI_Sendrecv(buffer_send_z(1, 1), Z_FACE_SIZE, MPI_REAL, high, tag, &
-                        buffer_rcv_z(1, 1), Z_FACE_SIZE, MPI_REAL, low, tag, &
+      call MPI_Sendrecv(array(0, 0, nz), Z_FACE_SIZE, MPI_REAL, high, tag, &
+                        array(0, 0, 0), Z_FACE_SIZE, MPI_REAL, low, tag, &
                         comm_cart, status, ierr)
-      array(:, :, 0) = buffer_rcv_z
 
       ! Exchange X direction; I send West halo to West neighbour, I receive East halo from East Neighbour
       buffer_send_x = array(1, :, :)
@@ -78,11 +80,9 @@ contains
       array(:, ny + 1, :) = buffer_rcv_y
 
       ! Exchange Z direction; I send Low halo to Low neighbour, I receive High halo from High Neighbour
-      buffer_send_z = array(:, :, 1)
-      call MPI_Sendrecv(buffer_send_z(1, 1), Z_FACE_SIZE, MPI_REAL, low, tag, &
-                        buffer_rcv_z(1, 1), Z_FACE_SIZE, MPI_REAL, high, tag, &
+      call MPI_Sendrecv(array(0, 0, 1), Z_FACE_SIZE, MPI_REAL, low, tag, &
+                        array(0, 0, nz + 1), Z_FACE_SIZE, MPI_REAL, high, tag, &
                         comm_cart, status, ierr)
-      array(:, :, nz + 1) = buffer_rcv_z
 
    end subroutine update_mpi_halo_real
 

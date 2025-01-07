@@ -51,7 +51,7 @@ contains
    !> only when the face belongs to the physical boundary.
    subroutine apply_boundaries(array, bc_types)
       use lib_parameters, only: dirichlet_value
-      real(kind=sp), intent(inout) :: array(:, :, :)
+      real(kind=sp), contiguous, intent(in out) :: array(:, :, :)
       integer, intent(in) :: bc_types(6)
       integer :: face
 
@@ -76,9 +76,9 @@ contains
 
    !> Applies a Dirichlet boundary condition by setting boundary cells to a constant.
    subroutine apply_dirichlet(array, face, constant_value)
-      real(kind=sp), intent(inout) :: array(:, :, :)
+      real(kind=sp), contiguous, intent(in out) :: array(:, :, :)
       integer, intent(in) :: face
-      real, intent(in) :: constant_value ! this value could be an array of values for each face
+      real(kind=sp), intent(in) :: constant_value ! this value could be an array of values for each face
 
       select case (face)
       case (D_WEST)
@@ -104,7 +104,7 @@ contains
 
    !> Applies a Neumann boundary by copying data from the adjacent interior cell.
    subroutine apply_neumann(array, face)
-      real, intent(inout) :: array(:, :, :)
+      real(kind=sp), contiguous, intent(in out) :: array(:, :, :)
       integer, intent(in) :: face
 
       select case (face)
