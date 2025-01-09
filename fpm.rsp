@@ -21,3 +21,6 @@ option install --compiler mpif90 --profile release --prefix $PWD --flag "-O3 -fl
 
 @installgcc-opt2
 option install --compiler mpif90 --profile release --prefix $PWD --flag "-O3 -flto -march=native -fPIC -funroll-loops -ffast-math -fassociative-math -freciprocal-math"
+
+@installgcc-maqao
+option install --compiler mpif90 --profile release --prefix $PWD --flag "-g -fno-omit-frame-pointer -O3 -flto -march=native -fPIC -funroll-loops -ffast-math -fassociative-math -freciprocal-math -floop-unroll-and-jam -mprefer-vector-width=512 "
