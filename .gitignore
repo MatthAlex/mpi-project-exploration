@@ -168,3 +168,6 @@ cython_debug/
 docs/ford
 ## FPM
 bin/*
+## Profiling
+maqao/*
+!maqao/template_mpi.json
