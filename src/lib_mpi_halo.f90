@@ -9,7 +9,7 @@ module lib_mpi_halo
    use lib_parameters, only: nx => num_cells_x, ny => num_cells_y, nz => num_cells_z
    implicit none
    private
-   public :: update_mpi_halo, init_arrays
+   public :: update_mpi_halo, init_arrays, init_ptrs
 
    integer :: ierr
    integer :: status(MPI_STATUS_SIZE)
@@ -22,6 +22,15 @@ module lib_mpi_halo
    !> Buffers for real transfers - avoids allocation
    real(kind=sp), allocatable :: buffer_send_x(:,:), buffer_rcv_x(:,:)
    real(kind=sp), allocatable :: buffer_send_y(:,:), buffer_rcv_y(:,:)
+
+   real(kind=sp), pointer :: west_face_halo(:, :) => null()
+   real(kind=sp), pointer :: east_face_halo(:, :) => null()
+   real(kind=sp), pointer :: south_face_halo(:, :) => null()
+   real(kind=sp), pointer :: north_face_halo(:, :) => null()
+   real(kind=sp), pointer :: west_face_halo2(:, :) => null()
+   real(kind=sp), pointer :: east_face_halo2(:, :) => null()
+   real(kind=sp), pointer :: south_face_halo2(:, :) => null()
+   real(kind=sp), pointer :: north_face_halo2(:, :) => null()
 
    !> Direction face-surface sizes
    integer, parameter :: X_FACE_SIZE = (ny + 2) * (nz + 2)
@@ -42,41 +51,72 @@ contains
       allocate (buffer_send_y(nx + 2, nz + 2), buffer_rcv_y(nx + 2, nz + 2))
    end subroutine init_arrays
 
+   subroutine init_ptrs(array)
+      real(kind=sp), contiguous, target, intent(in) :: array(:,:,:)
+      west_face_halo => array(lbound(array, 1), :, :)
+      east_face_halo => array(ubound(array, 1) - 1, :, :)
+      south_face_halo => array(:, lbound(array, 2), :)
+      north_face_halo => array(:, ubound(array, 2) - 1, :)
+      west_face_halo2 => array(lbound(array, 1) + 1, :, :)
+      east_face_halo2 => array(ubound(array, 1), :, :)
+      south_face_halo2 => array(:, lbound(array, 2) + 1, :)
+      north_face_halo2 => array(:, ubound(array, 2), :)
+   end subroutine init_ptrs
+
    !> Perform halo exchanges in all 3 directions for a REAL array
    subroutine update_mpi_halo_real(array)
       real(kind=sp), contiguous, intent(in out) :: array(:,:,:)
 
+      ! west_face_halo => array(lbound(array, 1), :, :)
+      ! east_face_halo => array(ubound(array, 1) - 1, :, :)
+      ! south_face_halo => array(:, lbound(array, 2), :)
+      ! north_face_halo => array(:, ubound(array, 2) - 1, :)
+
+
       ! Exchange X direction; I send East halo to East neighbour, I receive West halo from West Neighbour
       buffer_send_x = array(ubound(array, 1) - 1, :, :)
+      ! buffer_send_x = east_face_halo
       call MPI_Sendrecv(buffer_send_x(1, 1), X_FACE_SIZE, MPI_REAL, east, tag, &
                         buffer_rcv_x(1, 1), X_FACE_SIZE, MPI_REAL, west, tag, &
                         comm_cart, status, ierr)
       array(lbound(array, 1), :, :) = buffer_rcv_x
+      ! west_face_halo = buffer_rcv_x
 
       ! Exchange Y direction; I send North halo to North neighbour, I receive South halo from South Neighbour
       buffer_send_y = array(:, ubound(array, 2) - 1, :)
+      ! buffer_send_y = north_face_halo
       call MPI_Sendrecv(buffer_send_y(1, 1), Y_FACE_SIZE, MPI_REAL, north, tag, &
                         buffer_rcv_y(1, 1), Y_FACE_SIZE, MPI_REAL, south, tag, &
                         comm_cart, status, ierr)
       array(:, lbound(array, 2), :) = buffer_rcv_y
+      ! south_face_halo = buffer_rcv_y
 
       ! Exchange Z direction; I send High halo to High neighbour, I receive Low halo from Low Neighbour
       call MPI_Sendrecv(array(1, 1, nz + 1), Z_FACE_SIZE, MPI_REAL, high, tag, &
                         array(1, 1, 1), Z_FACE_SIZE, MPI_REAL, low, tag, &
                         comm_cart, status, ierr)
 
+      ! west_face_halo => array(lbound(array, 1) + 1, :, :)
+      ! east_face_halo => array(ubound(array, 1), :, :)
+      ! south_face_halo => array(:, lbound(array, 2) + 1, :)
+      ! north_face_halo => array(:, ubound(array, 2), :)
+
       ! Exchange X direction; I send West halo to West neighbour, I receive East halo from East Neighbour
       buffer_send_x = array(2, :, :)
+      ! buffer_send_x = west_face_halo2
       call MPI_Sendrecv(buffer_send_x(1, 1), X_FACE_SIZE, MPI_REAL, west, tag, &
                         buffer_rcv_x(1, 1), X_FACE_SIZE, MPI_REAL, east, tag, &
                         comm_cart, status, ierr)
+      ! east_face_halo2 = buffer_rcv_x
       array(nx + 2, :, :) = buffer_rcv_x
 
       ! Exchange Y direction; I send South halo to South neighbour, I receive North halo from North Neighbour
       buffer_send_y = array(:, 2, :)
+      ! buffer_send_y = south_face_halo2
       call MPI_Sendrecv(buffer_send_y(1, 1), Y_FACE_SIZE, MPI_REAL, south, tag, &
                         buffer_rcv_y(1, 1), Y_FACE_SIZE, MPI_REAL, north, tag, &
                         comm_cart, status, ierr)
+      ! north_face_halo2 = buffer_rcv_y
       array(:, ny + 2, :) = buffer_rcv_y
 
       ! Exchange Z direction; I send Low halo to Low neighbour, I receive High halo from High Neighbour

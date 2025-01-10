@@ -8,7 +8,7 @@ program sendrecv_3D
    use precision, only: sp, dp
    use grid_module, only: initialize_MPI_grid, rank => my_rank, comm_cart
    use lib_parameters, only: nx => num_cells_x, ny => num_cells_y, nz => num_cells_z, iterations, boundaries
-   use lib_mpi_halo, only: update_mpi_halo, init_arrays
+   use lib_mpi_halo, only: update_mpi_halo, init_arrays, init_ptrs
    use test_halo, only: check_halo_real
    use test_boundary, only: check_boundary_real
    use boundary, only: determine_rank_boundaries, apply_boundaries
@@ -27,6 +27,7 @@ program sendrecv_3D
 
    ! Create a local array with halo regions
    allocate (array(0:nx + 1, 0:ny + 1, 0:nz + 1), source=real(rank, kind=sp))
+   call init_ptrs(array)
 
    start = MPI_WTime()
    do i = 1, iterations
