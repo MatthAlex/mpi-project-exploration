@@ -1,7 +1,7 @@
 module grid_module
    use mpi, only: MPI_Cart_coords, MPI_Cart_create, MPI_Cart_shift, MPI_Comm_rank, MPI_Comm_size, MPI_Dims_create
    use mpi, only: MPI_COMM_WORLD, MPI_SUCCESS
-   implicit none
+   implicit none (type, external)
    private
    public :: initialize_MPI_grid
 

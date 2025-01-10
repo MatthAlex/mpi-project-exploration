@@ -1,7 +1,7 @@
 program simple_mpi_f08
    use mpi_f08, only: MPI_Init, MPI_SUCCESS, MPI_COMM_WORLD, MPI_Status, MPI_Sendrecv, MPI_INTEGER
    use mpi_f08, only: MPI_Comm_size, MPI_Comm_rank
-   implicit none
+   implicit none (type, external)
 
    integer :: ierr
    integer :: rank, size
@@ -34,14 +34,14 @@ program simple_mpi_f08
    sendval = rank
 
    ! Perform Sendrecv operation: send rank to right neighbor, receive from left neighbor
-   call MPI_Sendrecv(sendval, 1, MPI_INTEGER, right, tag, & ! Send to right
+   call MPI_Sendrecv(sendval, 1, MPI_INTEGER, right, tag, &  ! Send to right
                      recvval, 1, MPI_INTEGER, left, tag, &  ! Receive from left
                      MPI_COMM_WORLD, status, ierr)
    if (ierr /= MPI_SUCCESS) error stop "Sendrecv failed"
    if (recvval /= left) error stop "Wrong value received from left"
 
 ! Perform Sendrecv operation: send rank to left neighbor, receive from right neighbor
-   call MPI_Sendrecv(sendval, 1, MPI_INTEGER, left, tag, & ! Send to left
+   call MPI_Sendrecv(sendval, 1, MPI_INTEGER, left, tag, &  ! Send to left
                      recvval, 1, MPI_INTEGER, right, tag, &  ! Receive from right
                      MPI_COMM_WORLD, status, ierr)
    if (ierr /= MPI_SUCCESS) error stop "Sendrecv failed"

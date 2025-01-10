@@ -1,12 +1,15 @@
 module lib_parameters
    use precision, only: sp
    use enums, only: PERIODIC, DIRICHLET, NEUMANN
-   implicit none
-   public
+   implicit none (type, external)
+   private
+   public :: num_cells_x, num_cells_y, num_cells_z
+   public :: iterations, boundaries, dirichlet_value
+
    integer, parameter :: num_cells = 5
-   integer, parameter :: num_cells_x = num_cells+1
-   integer, parameter :: num_cells_y = num_cells+2
-   integer, parameter :: num_cells_z = num_cells+3
+   integer, parameter :: num_cells_x = num_cells
+   integer, parameter :: num_cells_y = num_cells
+   integer, parameter :: num_cells_z = num_cells
 
    integer, parameter :: iterations = 2
 

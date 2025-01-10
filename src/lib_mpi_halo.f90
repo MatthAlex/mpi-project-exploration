@@ -7,7 +7,7 @@ module lib_mpi_halo
    use precision, only: sp
    use grid_module, only: west, east, south, north, low, high, comm_cart
    use lib_parameters, only: nx => num_cells_x, ny => num_cells_y, nz => num_cells_z
-   implicit none
+   implicit none (type, external)
    private
    public :: update_mpi_halo, init_arrays
 
@@ -20,8 +20,8 @@ module lib_mpi_halo
    integer, dimension(nx + 2, ny + 2) :: buffer_send_z_int, buffer_rcv_z_int
 
    !> Buffers for real transfers - avoids allocation
-   real(kind=sp), allocatable :: buffer_send_x(:,:), buffer_rcv_x(:,:)
-   real(kind=sp), allocatable :: buffer_send_y(:,:), buffer_rcv_y(:,:)
+   real(kind=sp), allocatable :: buffer_send_x(:, :), buffer_rcv_x(:, :)
+   real(kind=sp), allocatable :: buffer_send_y(:, :), buffer_rcv_y(:, :)
 
    !> Direction face-surface sizes
    integer, parameter :: X_FACE_SIZE = (ny + 2) * (nz + 2)
@@ -44,7 +44,7 @@ contains
 
    !> Perform halo exchanges in all 3 directions for a REAL array
    subroutine update_mpi_halo_real(array)
-      real(kind=sp), contiguous, intent(in out) :: array(:,:,:)
+      real(kind=sp), contiguous, intent(in out) :: array(:, :, :)
 
       ! Exchange X direction; I send East halo to East neighbour, I receive West halo from West Neighbour
       buffer_send_x = array(ubound(array, 1) - 1, :, :)

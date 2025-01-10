@@ -1,7 +1,8 @@
 module test_halo
    use lib_parameters, only: nx => num_cells_x, ny => num_cells_y, nz => num_cells_z
    use grid_module, only: west, east, south, north, low, high, rank => my_rank
-   implicit none
+   use precision, only: sp
+   implicit none (type, external)
    private
    public :: check_halo_real
 contains
@@ -12,7 +13,7 @@ contains
    !! Reminder: we only test the non-physical halo regions
    subroutine check_halo_real(array)
       use boundary, only: is_bc_face
-      real, dimension(0:, 0:, 0:), intent(in) :: array
+      real(kind=sp), dimension(0:, 0:, 0:), intent(in) :: array
       if (any(int(array(0, 1:ny, 1:nz)) /= west .and. .not. is_bc_face(1))) &
          error stop "NOT OK in west"
 

@@ -28,4 +28,6 @@ source-dir = "app"
 main = "sendrecv_3D.f90"
 
 [extra.fortitude.check]
-line_length = 132
+preview = true
+select = ["E", "F", "M", "P", "S", "T"]
+line-length = 132

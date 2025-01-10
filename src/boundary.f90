@@ -11,7 +11,7 @@ module boundary
    use grid_module, only: west, east, south, north, low, high, rank => my_rank
    use lib_parameters, only: boundaries, nx => num_cells_x, ny => num_cells_y, nz => num_cells_z
    use enums, only: D_WEST, D_EAST, D_SOUTH, D_NORTH, D_LOW, D_HIGH, PERIODIC, DIRICHLET, NEUMANN
-   implicit none
+   implicit none (type, external)
    private
    public :: determine_rank_boundaries, apply_boundaries
    public :: is_rank_inside, is_bc_face
@@ -61,13 +61,13 @@ contains
          if (.not. is_bc_face(face)) cycle
 
          select case (bc_types(face))
-         case (PERIODIC) ! Periodic is handled by MPI
+         case (PERIODIC)  ! Periodic is handled by MPI
             cycle
-         case (DIRICHLET) ! Dirichlet
+         case (DIRICHLET)  ! Dirichlet
             call apply_dirichlet(array, face, constant_value=dirichlet_value)
-         case (NEUMANN) ! Von Neumann
+         case (NEUMANN)  ! Von Neumann
             call apply_neumann(array, face)
-         case default ! placeholder
+         case default  ! placeholder
             call apply_custom_bc(array, face)
          end select
       end do
@@ -78,26 +78,27 @@ contains
    subroutine apply_dirichlet(array, face, constant_value)
       real(kind=sp), contiguous, intent(in out) :: array(:, :, :)
       integer, intent(in) :: face
-      real(kind=sp), intent(in) :: constant_value ! this value could be an array of values for each face
+      !> This value is shared across all faces but could be an array of values for each face
+      real(kind=sp), intent(in) :: constant_value
 
       select case (face)
       case (D_WEST)
-         if (DEBUG) write(*,'(2(A,1X,I0))')"BC DIRICHLET: Updating face", D_WEST, " for rank:", rank
+         if (DEBUG) write (*, '(2(A,1X,I0))') "BC DIRICHLET: Updating face", D_WEST, " for rank:", rank
          array(1, :, :) = constant_value
       case (D_EAST)
-         if (DEBUG) write(*,'(2(A,1X,I0))')"BC DIRICHLET: Updating face", D_EAST, " for rank:", rank
+         if (DEBUG) write (*, '(2(A,1X,I0))') "BC DIRICHLET: Updating face", D_EAST, " for rank:", rank
          array(ubound(array, 1), :, :) = constant_value
       case (D_SOUTH)
-         if (DEBUG) write(*,'(2(A,1X,I0))')"BC DIRICHLET: Updating face", D_SOUTH, " for rank:", rank
+         if (DEBUG) write (*, '(2(A,1X,I0))') "BC DIRICHLET: Updating face", D_SOUTH, " for rank:", rank
          array(:, 1, :) = constant_value
       case (D_NORTH)
-         if (DEBUG) write(*,'(2(A,1X,I0))')"BC DIRICHLET: Updating face", D_NORTH, " for rank:", rank
+         if (DEBUG) write (*, '(2(A,1X,I0))') "BC DIRICHLET: Updating face", D_NORTH, " for rank:", rank
          array(:, ubound(array, 2), :) = constant_value
       case (D_LOW)
-         if (DEBUG) write(*,'(2(A,1X,I0))')"BC DIRICHLET: Updating face", D_LOW, " for rank:", rank
+         if (DEBUG) write (*, '(2(A,1X,I0))') "BC DIRICHLET: Updating face", D_LOW, " for rank:", rank
          array(:, :, 1) = constant_value
       case (D_HIGH)
-         if (DEBUG) write(*,'(2(A,1X,I0))')"BC DIRICHLET: Updating face", D_HIGH, " for rank:", rank
+         if (DEBUG) write (*, '(2(A,1X,I0))') "BC DIRICHLET: Updating face", D_HIGH, " for rank:", rank
          array(:, :, ubound(array, 3)) = constant_value
       end select
    end subroutine apply_dirichlet
@@ -118,8 +119,9 @@ contains
    end subroutine apply_neumann
 
    subroutine apply_custom_bc(array, face)
-      real, intent(inout) :: array(:, :, :)
-      integer :: face, ierr
+      real(kind=sp), intent(inout) :: array(:, :, :)
+      integer, intent(in) :: face
+      integer :: ierr
 
       print *, "Custom BC Not implemented yet. Exiting.."
       call MPI_Finalize(ierr)

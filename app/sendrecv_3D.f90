@@ -12,7 +12,7 @@ program sendrecv_3D
    use test_halo, only: check_halo_real
    use test_boundary, only: check_boundary_real
    use boundary, only: determine_rank_boundaries, apply_boundaries
-   implicit none
+   implicit none (type, external)
 
    integer :: ierr
    real(kind=sp), allocatable :: array(:, :, :)
@@ -40,10 +40,10 @@ program sendrecv_3D
       call MPI_Barrier(comm=comm_cart, ierror=ierr)
    end do
    finish = MPI_WTime()
-   if (rank == 0) print '(A,1X,F8.2)', "MPI TIME:", finish-start
+   if (rank == 0) print '(A,1X,F8.2,A)', "MPI TIME:", finish - start, "s"
 
    ! Since the tests above pass
-   if (rank == 0) print*, "Success!"
+   if (rank == 0) print *, "Success!"
 
    call MPI_Finalize(ierr)
 

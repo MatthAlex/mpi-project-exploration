@@ -2,13 +2,14 @@
 program sendrecv_1D
    use mpi, only: MPI_Init, MPI_Comm_rank, MPI_Comm_size, MPI_Sendrecv, MPI_Finalize
    use mpi, only: MPI_COMM_WORLD, MPI_STATUS_SIZE, MPI_REAL
-   implicit none
+   use precision, only: sp
+   implicit none (type, external)
 
    integer :: ierr, rank, comsize
    integer :: left, right
    integer :: tag
    integer :: status(MPI_STATUS_SIZE)
-   real(kind=4), allocatable :: array_halo_exchange(:)
+   real(kind=sp), allocatable :: array_halo_exchange(:)
    integer :: num_cells
 
    call MPI_Init(ierr)
@@ -42,7 +43,7 @@ program sendrecv_1D
    if (int(array_halo_exchange(num_cells + 1)) /= right) error stop "Right halo cell not updated correctly"
 
    ! Given the tests above have passed
-   if (rank == 0) print*, "Success!"
+   if (rank == 0) print *, "Success!"
 
    call MPI_Finalize(ierr)
 end program sendrecv_1D
