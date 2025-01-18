@@ -6,9 +6,9 @@ module grid_module
    public :: initialize_MPI_grid
 
    !> Number of cores alongside the cardinal Cartesian directions
-   integer :: dims(3) = [0, 0, 0]
+   integer, allocatable :: dims(:)
    !> Number of dimensions for the Cartesian topology decomposition
-   integer, parameter :: ndims = 3
+   integer :: ndims
    !> Logical array of size ndims specifying whether the grid is periodic (true) or not (false) in each dimension.
    logical :: is_periodic(3)
    !> Core ranking may be reordered (true) or not (false) (logical).
@@ -23,7 +23,7 @@ module grid_module
    !> Cartesian MPI communicator
    integer, public :: comm_cart
    !> Cartesian MPI coordinates. Coordinates use 0-based indexing.
-   integer, public :: my_coordinates(ndims)
+   integer, allocatable, public :: my_coordinates(:)
 
 contains
 
@@ -36,13 +36,17 @@ contains
    !> 4. Create the 3D Cartesian communicator (comm_cart).
    !> 5. Determine rank, coordinates, and neighbors in the new communicator.
    subroutine initialize_MPI_grid()
-      use lib_parameters, only: boundaries
-      integer :: original_comm, ierr, original_comsize
+      use lib_parameters, only: boundaries, core_decomposition, dim_decomposition
+      integer :: original_comm, ierr, original_comsize, my_coord(3)
       original_comm = MPI_COMM_WORLD
 
       ! Probe the size of the original communicator
       call MPI_Comm_size(original_comm, original_comsize, ierr)
       if (ierr /= MPI_SUCCESS) error stop "Error in Comm_size"
+
+      if (any(core_decomposition < 0)) error stop "Core decomposition can't have negative values."
+      ndims = dim_decomposition
+      dims = core_decomposition
 
       ! Creates a division of cores in a Cartesian ndims-dimensional X(, Y(, Z)) grid
       call MPI_Dims_create(nnodes=original_comsize, ndims=ndims, dims=dims, ierror=ierr)
@@ -66,8 +70,9 @@ contains
       if (ierr /= MPI_SUCCESS) error stop "Error deciding ranks in Cartesian"
 
       ! Get the 3D coordinates for this rank
-      call MPI_Cart_coords(comm_cart, my_rank, ndims, my_coordinates, ierr)
+      call MPI_Cart_coords(comm_cart, my_rank, ndims, my_coord, ierr)
       if (ierr /= MPI_SUCCESS) error stop "Error getting cartesian coordinates"
+      my_coordinates = my_coord  ! MPI \= allocatable
 
       ! Determine rank's nearest neighbors in all 6 directions
       call get_neighbors()
