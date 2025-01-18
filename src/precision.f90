@@ -1,6 +1,6 @@
 module precision
    use iso_fortran_env, only: real32, real64
-   implicit none (type, external)
+   implicit none(type, external)
    private
    public :: sp, dp
    integer, parameter :: sp = real32

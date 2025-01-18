@@ -2,7 +2,7 @@ module test_halo
    use lib_parameters, only: nx => num_cells_x, ny => num_cells_y, nz => num_cells_z
    use grid_module, only: west, east, south, north, low, high, rank => my_rank
    use precision, only: sp
-   implicit none (type, external)
+   implicit none(type, external)
    private
    public :: check_halo_real
 contains

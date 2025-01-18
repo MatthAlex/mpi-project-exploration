@@ -3,7 +3,7 @@ module test_boundary
    use lib_parameters, only: nx => num_cells_x, ny => num_cells_y, nz => num_cells_z, boundaries
    use grid_module, only: west, east, south, north, low, high, rank => my_rank
    use enums, only: D_WEST, D_EAST, D_SOUTH, D_NORTH, D_LOW, D_HIGH, PERIODIC, DIRICHLET, NEUMANN
-   implicit none (type, external)
+   implicit none(type, external)
    private
    public :: check_boundary_real
 

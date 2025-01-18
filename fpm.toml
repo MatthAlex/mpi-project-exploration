@@ -1,6 +1,6 @@
 name = "mpi"
 version = "2024.0.1"
-license = "license"
+license = "LICENSE"
 author = "Matthew Alexandrakis"
 maintainer = "matt.alexandrakis@gmail.com"
 copyright = "Copyright 2024, Matthew Alexandrakis"

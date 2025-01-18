@@ -7,7 +7,7 @@ module lib_mpi_halo
    use precision, only: sp
    use grid_module, only: west, east, south, north, low, high, comm_cart
    use lib_parameters, only: nx => num_cells_x, ny => num_cells_y, nz => num_cells_z
-   implicit none (type, external)
+   implicit none(type, external)
    private
    public :: update_mpi_halo, init_arrays
 

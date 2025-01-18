@@ -1,5 +1,5 @@
 module enums
-   implicit none (type, external)
+   implicit none(type, external)
    private
    !> Cartesian directions
    integer, public, parameter :: X_DIR = 0, Y_DIR = 1, Z_DIR = 2

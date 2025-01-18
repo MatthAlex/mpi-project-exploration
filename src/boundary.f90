@@ -11,7 +11,7 @@ module boundary
    use grid_module, only: west, east, south, north, low, high, rank => my_rank
    use lib_parameters, only: boundaries, nx => num_cells_x, ny => num_cells_y, nz => num_cells_z
    use enums, only: D_WEST, D_EAST, D_SOUTH, D_NORTH, D_LOW, D_HIGH, PERIODIC, DIRICHLET, NEUMANN
-   implicit none (type, external)
+   implicit none(type, external)
    private
    public :: determine_rank_boundaries, apply_boundaries
    public :: is_rank_inside, is_bc_face
@@ -63,11 +63,11 @@ contains
          select case (bc_types(face))
          case (PERIODIC)  ! Periodic is handled by MPI
             cycle
-         case (DIRICHLET)  ! Dirichlet
+         case (DIRICHLET)
             call apply_dirichlet(array, face, constant_value=dirichlet_value)
-         case (NEUMANN)  ! Von Neumann
+         case (NEUMANN)
             call apply_neumann(array, face)
-         case default  ! placeholder
+         case default
             call apply_custom_bc(array, face)
          end select
       end do

@@ -1,7 +1,7 @@
 module lib_parameters
    use precision, only: sp
    use enums, only: PERIODIC, DIRICHLET, NEUMANN
-   implicit none (type, external)
+   implicit none(type, external)
    private
    public :: num_cells_x, num_cells_y, num_cells_z
    public :: iterations, boundaries, dirichlet_value
@@ -13,7 +13,7 @@ module lib_parameters
 
    integer, parameter :: iterations = 2
 
-   !> 0 is Periodic, 1 is Dirichlet, 2 is Neumann
+   !> Boundaries for each face: West, East, South, North, Low, High
    integer, parameter :: boundaries(6) = [DIRICHLET, DIRICHLET, NEUMANN, NEUMANN, PERIODIC, PERIODIC]
 
    !> Dirichlet Boundary Condition value
