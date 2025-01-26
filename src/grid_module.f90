@@ -1,6 +1,6 @@
 module grid_module
-   use mpi, only: MPI_Cart_coords, MPI_Cart_create, MPI_Cart_shift, MPI_Comm_rank, MPI_Comm_size, MPI_Dims_create
-   use mpi, only: MPI_COMM_WORLD, MPI_SUCCESS
+   use mpi_f08, only: MPI_Cart_coords, MPI_Cart_create, MPI_Cart_shift, MPI_Comm_rank, MPI_Comm_size, MPI_Dims_create
+   use mpi_f08, only: MPI_COMM_WORLD, MPI_SUCCESS, MPI_Comm
    implicit none(type, external)
    private
    public :: initialize_MPI_grid
@@ -20,8 +20,9 @@ module grid_module
    integer, public :: comsize
    !> Ranks of Nearest Neighbours
    integer, public :: west, east, north, south, low, high
-   !> Cartesian MPI communicator
-   integer, public :: comm_cart
+   !> Old and Cartesian MPI communicators
+   type(MPI_Comm) :: original_comm = MPI_COMM_WORLD
+   type(MPI_Comm), public :: comm_cart
    !> Cartesian MPI coordinates. Coordinates use 0-based indexing.
    integer, allocatable, public :: my_coordinates(:)
 
@@ -37,8 +38,7 @@ contains
    !> 5. Determine rank, coordinates, and neighbors in the new communicator.
    subroutine initialize_MPI_grid()
       use lib_parameters, only: boundaries, core_decomposition, dim_decomposition
-      integer :: original_comm, ierr, original_comsize, my_coord(3)
-      original_comm = MPI_COMM_WORLD
+      integer :: ierr, original_comsize, my_coord(3)
 
       ! Probe the size of the original communicator
       call MPI_Comm_size(original_comm, original_comsize, ierr)
@@ -56,7 +56,7 @@ contains
       call set_periodic_boundaries(boundaries)
 
       ! Makes a new communicator to which Cartesian topology information has been attached.
-      call MPI_Cart_create(original_comm, ndims, dims, is_periodic, reorder, comm_cart, ierr)
+      call MPI_Cart_create(original_comm, ndims, core_decomposition, is_periodic, reorder, comm_cart, ierr)
       if (ierr /= MPI_SUCCESS) error stop "Error creating Cartesian communicator"
 
       ! Probe the size of the Cartesian communicator
