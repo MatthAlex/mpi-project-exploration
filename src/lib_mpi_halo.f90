@@ -3,7 +3,7 @@
 !> - module procedure to generalise subroutine calling
 !> - independent dimensionality
 module lib_mpi_halo
-   use mpi_f08, only: MPI_Sendrecv, MPI_STATUS, MPI_REAL, MPI_INTEGER
+   use mpi_f08, only: MPI_Sendrecv, MPI_STATUS, MPI_REAL, MPI_INTEGER, MPI_ISendrecv, MPI_Request, MPI_Wait
    use precision, only: sp
    use grid_module, only: west, east, south, north, low, high, comm_cart
    use lib_parameters, only: nx => num_cells_x, ny => num_cells_y, nz => num_cells_z
@@ -12,8 +12,8 @@ module lib_mpi_halo
    public :: update_mpi_halo, init_arrays
 
    integer :: ierr
-   type(MPI_Status) :: status
-
+   type(MPI_Status), public :: status
+   TYPE(MPI_Request), public :: request
    !> Buffers for integer transfers - avoids allocation
    integer, dimension(ny + 2, nz + 2) :: buffer_send_x_int, buffer_rcv_x_int
    integer, dimension(nx + 2, nz + 2) :: buffer_send_y_int, buffer_rcv_y_int
@@ -48,41 +48,46 @@ contains
 
       ! Exchange X direction; I send East halo to East neighbour, I receive West halo from West Neighbour
       buffer_send_x = array(ubound(array, 1) - 1, :, :)
-      call MPI_Sendrecv(buffer_send_x(1, 1), X_FACE_SIZE, MPI_REAL, east, tag, &
+      call MPI_ISendrecv(buffer_send_x(1, 1), X_FACE_SIZE, MPI_REAL, east, tag, &
                         buffer_rcv_x(1, 1), X_FACE_SIZE, MPI_REAL, west, tag, &
-                        comm_cart, status, ierr)
-      array(lbound(array, 1), :, :) = buffer_rcv_x
+                        comm_cart, request, ierr)
 
       ! Exchange Y direction; I send North halo to North neighbour, I receive South halo from South Neighbour
       buffer_send_y = array(:, ubound(array, 2) - 1, :)
-      call MPI_Sendrecv(buffer_send_y(1, 1), Y_FACE_SIZE, MPI_REAL, north, tag, &
+      call MPI_ISendrecv(buffer_send_y(1, 1), Y_FACE_SIZE, MPI_REAL, north, tag, &
                         buffer_rcv_y(1, 1), Y_FACE_SIZE, MPI_REAL, south, tag, &
-                        comm_cart, status, ierr)
-      array(:, lbound(array, 2), :) = buffer_rcv_y
+                        comm_cart, request, ierr)
 
       ! Exchange Z direction; I send High halo to High neighbour, I receive Low halo from Low Neighbour
-      call MPI_Sendrecv(array(1, 1, nz + 1), Z_FACE_SIZE, MPI_REAL, high, tag, &
+      call MPI_ISendrecv(array(1, 1, nz + 1), Z_FACE_SIZE, MPI_REAL, high, tag, &
                         array(1, 1, 1), Z_FACE_SIZE, MPI_REAL, low, tag, &
-                        comm_cart, status, ierr)
+                        comm_cart, request, ierr)
+
+      ! Start copying next batch
+      buffer_send_x = array(2, :, :)
+      buffer_send_y = array(:, 2, :)
+      call MPI_Wait(request, status, ierr)
+      array(lbound(array, 1), :, :) = buffer_rcv_x
+      array(:, lbound(array, 2), :) = buffer_rcv_y
 
       ! Exchange X direction; I send West halo to West neighbour, I receive East halo from East Neighbour
-      buffer_send_x = array(2, :, :)
-      call MPI_Sendrecv(buffer_send_x(1, 1), X_FACE_SIZE, MPI_REAL, west, tag, &
+      call MPI_ISendrecv(buffer_send_x(1, 1), X_FACE_SIZE, MPI_REAL, west, tag, &
                         buffer_rcv_x(1, 1), X_FACE_SIZE, MPI_REAL, east, tag, &
-                        comm_cart, status, ierr)
-      array(nx + 2, :, :) = buffer_rcv_x
+                        comm_cart, request, ierr)
 
       ! Exchange Y direction; I send South halo to South neighbour, I receive North halo from North Neighbour
-      buffer_send_y = array(:, 2, :)
-      call MPI_Sendrecv(buffer_send_y(1, 1), Y_FACE_SIZE, MPI_REAL, south, tag, &
+      call MPI_ISendrecv(buffer_send_y(1, 1), Y_FACE_SIZE, MPI_REAL, south, tag, &
                         buffer_rcv_y(1, 1), Y_FACE_SIZE, MPI_REAL, north, tag, &
-                        comm_cart, status, ierr)
-      array(:, ny + 2, :) = buffer_rcv_y
+                        comm_cart, request, ierr)
 
       ! Exchange Z direction; I send Low halo to Low neighbour, I receive High halo from High Neighbour
-      call MPI_Sendrecv(array(1, 1, 2), Z_FACE_SIZE, MPI_REAL, low, tag, &
+      call MPI_ISendrecv(array(1, 1, 2), Z_FACE_SIZE, MPI_REAL, low, tag, &
                         array(1, 1, nz + 2), Z_FACE_SIZE, MPI_REAL, high, tag, &
-                        comm_cart, status, ierr)
+                        comm_cart, request, ierr)
+
+      call MPI_Wait(request, status, ierr)
+      array(nx + 2, :, :) = buffer_rcv_x
+      array(:, ny + 2, :) = buffer_rcv_y
 
    end subroutine update_mpi_halo_real
 
