@@ -1,4 +1,4 @@
-module grid_module
+module mpi_domain
    use mpi_f08, only: MPI_Cart_coords, MPI_Cart_create, MPI_Cart_shift, MPI_Comm_rank, MPI_Comm_size, MPI_Dims_create
    use mpi_f08, only: MPI_COMM_WORLD, MPI_SUCCESS, MPI_Comm
    implicit none(type, external)
@@ -41,7 +41,7 @@ contains
    !> 4. Create the 3D Cartesian communicator (comm_cart).
    !> 5. Determine rank, coordinates, and neighbors in the new communicator.
    subroutine create_mpi_domain()
-      use lib_parameters, only: boundaries, core_decomposition, dim_decomposition
+      use parameters, only: boundaries, core_decomposition, dim_decomposition
       integer :: ierr, original_comsize
 
       ! Probe the size of the original communicator
@@ -114,4 +114,4 @@ contains
 
    end subroutine set_periodic_boundaries
 
-end module grid_module
+end module mpi_domain

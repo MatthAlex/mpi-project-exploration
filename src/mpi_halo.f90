@@ -2,11 +2,11 @@
 !> - static transfer buffers - avoid allocation every update
 !> - module procedure to generalise subroutine calling
 !> - independent dimensionality
-module lib_mpi_halo
+module mpi_halo
    use mpi_f08, only: MPI_Sendrecv, MPI_STATUS, MPI_REAL, MPI_INTEGER
    use precision, only: sp
-   use grid_module, only: west, east, south, north, low, high, comm_cart
-   use lib_parameters, only: nx => num_cells_x, ny => num_cells_y, nz => num_cells_z
+   use mpi_domain, only: west, east, south, north, low, high, comm_cart
+   use parameters, only: nx => num_cells_x, ny => num_cells_y, nz => num_cells_z
    implicit none(type, external)
    private
    public :: update_mpi_halo, initialize_halo_buffers
@@ -138,4 +138,4 @@ contains
 
    end subroutine update_mpi_halo_integer
 
-end module lib_mpi_halo
+end module mpi_halo

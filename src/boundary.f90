@@ -8,8 +8,8 @@
 module boundary
    use mpi_f08, only: MPI_PROC_NULL, MPI_Finalize
    use precision, only: sp
-   use grid_module, only: rank => my_rank, neighbor_ranks
-   use lib_parameters, only: boundaries, nx => num_cells_x, ny => num_cells_y, nz => num_cells_z
+   use mpi_domain, only: rank => my_rank, neighbor_ranks
+   use parameters, only: boundaries, nx => num_cells_x, ny => num_cells_y, nz => num_cells_z
    use enums, only: D_WEST, D_EAST, D_SOUTH, D_NORTH, D_LOW, D_HIGH, PERIODIC, DIRICHLET, NEUMANN
    implicit none(type, external)
    private
@@ -43,7 +43,7 @@ contains
    !> Applies boundary conditions to each boundary face of the local domain,
    !> only when the face belongs to the physical boundary.
    subroutine update_boundary_conditions(array, bc_types)
-      use lib_parameters, only: dirichlet_value
+      use parameters, only: dirichlet_value
       real(kind=sp), contiguous, intent(in out) :: array(:, :, :)
          !! Source array to update boundary conditions
       integer, intent(in) :: bc_types(6)

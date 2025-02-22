@@ -1,7 +1,7 @@
 module test_boundary
    use precision, only: sp
-   use lib_parameters, only: nx => num_cells_x, ny => num_cells_y, nz => num_cells_z, boundaries
-   use grid_module, only: west, east, south, north, low, high, rank => my_rank
+   use parameters, only: nx => num_cells_x, ny => num_cells_y, nz => num_cells_z, boundaries
+   use mpi_domain, only: west, east, south, north, low, high, rank => my_rank
    use enums, only: D_WEST, D_EAST, D_SOUTH, D_NORTH, D_LOW, D_HIGH, PERIODIC, DIRICHLET, NEUMANN
    implicit none(type, external)
    private
@@ -15,7 +15,7 @@ contains
    !> - Neumann (2): Should match adjacent interior cell
    subroutine check_boundary_real(array)
       use boundary, only: is_bc_face
-      use lib_parameters, only: dirichlet_value
+      use parameters, only: dirichlet_value
       real(kind=sp), dimension(:, :, :), intent(in) :: array
       real(kind=sp), parameter :: tolerance = 1.0e-10_sp
 
