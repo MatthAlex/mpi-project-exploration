@@ -107,6 +107,6 @@
     "fortran.linter.includePaths": [
         "${workspaceFolder}/.generated_modules"
     ],
-    "fortran.linter.compilerPath": "/usr/bin/gfortran",
+    "fortran.linter.compilerPath": "/usr/bin/mpif90",
     "fortran.linter.initialize": true,
 }

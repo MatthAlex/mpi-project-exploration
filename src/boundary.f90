@@ -8,7 +8,7 @@
 module boundary
    use mpi_f08, only: MPI_PROC_NULL, MPI_Finalize
    use precision, only: sp
-   use grid_module, only: west, east, south, north, low, high, rank => my_rank
+   use grid_module, only: rank => my_rank, neighbor_ranks
    use lib_parameters, only: boundaries, nx => num_cells_x, ny => num_cells_y, nz => num_cells_z
    use enums, only: D_WEST, D_EAST, D_SOUTH, D_NORTH, D_LOW, D_HIGH, PERIODIC, DIRICHLET, NEUMANN
    implicit none(type, external)
@@ -16,17 +16,12 @@ module boundary
    public :: determine_rank_boundaries, apply_boundaries
    public :: is_rank_inside, is_bc_face
 
-   !> Module array of neighbor ranks for each of the 6 faces in 3D.
-   integer :: neighbor_ranks(6)
-
-   !> Whether the local rank has a physical boundary on each face.
    logical :: is_bc_face(6)
-
-   !> Indicates if this rank is completely inside (no boundary faces).
+      !! Indicates if the local rank is a physical boundary, for each face.
    logical :: is_rank_inside
-
-   !> Print verbose debug statements
+      !! Indicates if this rank is completely inside (no boundary faces).
    logical, parameter :: DEBUG = .true.
+      !! Print verbose debug statements
 
 contains
 
@@ -36,7 +31,6 @@ contains
    !> - `is_bc_face(i) = .true.` if the face i has `MPI_PROC_NULL` neighbor
    !> - `rank_is_inside = .true.` if no face is a boundary
    subroutine determine_rank_boundaries()
-      neighbor_ranks = [west, east, south, north, low, high]
       is_bc_face = .false.
 
       ! Set boundary face booleans for this rank
@@ -52,16 +46,20 @@ contains
    subroutine apply_boundaries(array, bc_types)
       use lib_parameters, only: dirichlet_value
       real(kind=sp), contiguous, intent(in out) :: array(:, :, :)
+         !! Source array to update boundary conditions
       integer, intent(in) :: bc_types(6)
+         !! The boundary conditions for each face/direction
       integer :: face
+         !! Local loop variable - West, East, South, North, Low, High
 
       if (is_rank_inside) return
-      ! face is West, East, South, North, Low, High
+
       do face = 1, 6
          if (.not. is_bc_face(face)) cycle
 
          select case (bc_types(face))
-         case (PERIODIC)  ! Periodic is handled by MPI
+         case (PERIODIC)
+            ! Periodic is handled by MPI
             cycle
          case (DIRICHLET)
             call apply_dirichlet(array, face, constant_value=dirichlet_value)
@@ -78,8 +76,8 @@ contains
    subroutine apply_dirichlet(array, face, constant_value)
       real(kind=sp), contiguous, intent(in out) :: array(:, :, :)
       integer, intent(in) :: face
-      !> This value is shared across all faces but could be an array of values for each face
       real(kind=sp), intent(in) :: constant_value
+         !! Dirichlet constant value. Static across all faces
 
       select case (face)
       case (D_WEST)

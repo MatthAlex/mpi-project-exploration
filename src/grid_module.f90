@@ -5,26 +5,30 @@ module grid_module
    private
    public :: initialize_MPI_grid
 
-   !> Number of cores alongside the cardinal Cartesian directions
-   integer, allocatable :: dims(:)
-   !> Number of dimensions for the Cartesian topology decomposition
    integer :: ndims
-   !> Logical array of size ndims specifying whether the grid is periodic (true) or not (false) in each dimension.
+      !! Number of dimensions for the Cartesian topology decomposition
+   integer :: dims(3)
+      !! Number of cores alongside the cardinal Cartesian directions
    logical :: is_periodic(3)
-   !> Core ranking may be reordered (true) or not (false) (logical).
+      !! Logical array of size ndims specifying whether the grid is periodic (true) or not (false) in each dimension.
    logical, parameter :: reorder = .true.
+      !! Core ranking may be reordered (true) or not (false) (logical).
 
-   !> This rank
-   integer, public :: my_rank
-   !> Number of MPI processes
-   integer, public :: comsize
-   !> Ranks of Nearest Neighbours
-   integer, public :: west, east, north, south, low, high
-   !> Old and Cartesian MPI communicators
+   integer, protected, public :: my_rank
+      !! This rank
+   integer, protected, public :: comsize
+      !! Number of MPI processes
+   integer, protected, public :: west, east, north, south, low, high
+      !! Ranks of Nearest Neighbours
+   integer, protected, public :: neighbor_ranks(6)
+      !! Array of neighbor ranks for each of the 6 faces in 3D.
+
    type(MPI_Comm) :: original_comm = MPI_COMM_WORLD
-   type(MPI_Comm), public :: comm_cart
-   !> Cartesian MPI coordinates. Coordinates use 0-based indexing.
-   integer, allocatable, public :: my_coordinates(:)
+      !! Original MPI communicator
+   type(MPI_Comm), protected, public :: comm_cart
+      !! Cartesian MPI communicator
+   integer, protected, public :: my_coord(3)
+      !! Cartesian MPI coordinates. Coordinates use 0-based indexing.
 
 contains
 
@@ -38,7 +42,7 @@ contains
    !> 5. Determine rank, coordinates, and neighbors in the new communicator.
    subroutine initialize_MPI_grid()
       use lib_parameters, only: boundaries, core_decomposition, dim_decomposition
-      integer :: ierr, original_comsize, my_coord(3)
+      integer :: ierr, original_comsize
 
       ! Probe the size of the original communicator
       call MPI_Comm_size(original_comm, original_comsize, ierr)
@@ -56,7 +60,7 @@ contains
       call set_periodic_boundaries(boundaries)
 
       ! Makes a new communicator to which Cartesian topology information has been attached.
-      call MPI_Cart_create(original_comm, ndims, core_decomposition, is_periodic, reorder, comm_cart, ierr)
+      call MPI_Cart_create(original_comm, ndims, dims, is_periodic, reorder, comm_cart, ierr)
       if (ierr /= MPI_SUCCESS) error stop "Error creating Cartesian communicator"
 
       ! Probe the size of the Cartesian communicator
@@ -72,7 +76,6 @@ contains
       ! Get the 3D coordinates for this rank
       call MPI_Cart_coords(comm_cart, my_rank, ndims, my_coord, ierr)
       if (ierr /= MPI_SUCCESS) error stop "Error getting cartesian coordinates"
-      my_coordinates = my_coord  ! MPI \= allocatable
 
       ! Determine rank's nearest neighbors in all 6 directions
       call get_neighbors()
@@ -89,6 +92,8 @@ contains
       call MPI_Cart_shift(comm=comm_cart, direction=Y_DIR, disp=1, rank_source=south, rank_dest=north, ierror=ierr)
       call MPI_Cart_shift(comm=comm_cart, direction=Z_DIR, disp=1, rank_source=low, rank_dest=high, ierror=ierr)
       if (ierr /= MPI_SUCCESS) error stop "Error in Cartesian shift"
+
+      neighbor_ranks = [west, east, south, north, low, high]
    end subroutine get_neighbors
 
    !> Sets the periodic boundaries for the MPI Cartesian communicator, based on an array of boundary types.
