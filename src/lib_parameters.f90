@@ -13,13 +13,13 @@ module lib_parameters
 
    integer, parameter :: iterations = 2
 
-   !> Boundaries for each face: West, East, South, North, Low, High
    integer, parameter :: boundaries(6) = [DIRICHLET, DIRICHLET, NEUMANN, NEUMANN, PERIODIC, PERIODIC]
-   !> Number of dimensions for decomposition
+      !! Boundaries for each face: West, East, South, North, Low, High
    integer, parameter :: dim_decomposition = 3
-   !> MPI Core decomposition. If 0, the decomposition is automatic/left to MPI
+      !! Number of dimensions for decomposition
    integer, parameter :: core_decomposition(dim_decomposition) = 0
+      !! MPI Core decomposition. If 0, the decomposition is automatic/left to MPI
 
-   !> Dirichlet Boundary Condition value
    real(kind=sp), parameter :: dirichlet_value = -1.0_sp
+      !! Dirichlet Boundary Condition value
 end module lib_parameters

@@ -3,7 +3,7 @@ module grid_module
    use mpi_f08, only: MPI_COMM_WORLD, MPI_SUCCESS, MPI_Comm
    implicit none(type, external)
    private
-   public :: initialize_MPI_grid
+   public :: create_mpi_domain
 
    integer :: ndims
       !! Number of dimensions for the Cartesian topology decomposition
@@ -40,7 +40,7 @@ contains
    !> 3. Set periodic boundaries with set_periodic_boundaries.
    !> 4. Create the 3D Cartesian communicator (comm_cart).
    !> 5. Determine rank, coordinates, and neighbors in the new communicator.
-   subroutine initialize_MPI_grid()
+   subroutine create_mpi_domain()
       use lib_parameters, only: boundaries, core_decomposition, dim_decomposition
       integer :: ierr, original_comsize
 
@@ -79,7 +79,7 @@ contains
 
       ! Determine rank's nearest neighbors in all 6 directions
       call get_neighbors()
-   end subroutine initialize_MPI_grid
+   end subroutine create_mpi_domain
 
    !> Finds the ranks of the 6 nearest neighbors by shifting ±1 in X, Y, and Z.
    !>

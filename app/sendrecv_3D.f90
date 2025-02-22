@@ -6,12 +6,12 @@
 program sendrecv_3D
    use mpi_f08, only: MPI_Init, MPI_Barrier, MPI_Finalize, MPI_WTime
    use precision, only: sp, dp
-   use grid_module, only: initialize_MPI_grid, rank => my_rank, comm_cart
+   use grid_module, only: create_mpi_domain, rank => my_rank, comm_cart
    use lib_parameters, only: nx => num_cells_x, ny => num_cells_y, nz => num_cells_z, iterations, boundaries
-   use lib_mpi_halo, only: update_mpi_halo, init_arrays
+   use lib_mpi_halo, only: update_mpi_halo, initialize_halo_buffers
    use test_halo, only: check_halo_real
    use test_boundary, only: check_boundary_real
-   use boundary, only: determine_rank_boundaries, apply_boundaries
+   use boundary, only: determine_rank_boundaries, update_boundary_conditions
    implicit none (type, external)
 
    integer :: ierr
@@ -20,8 +20,8 @@ program sendrecv_3D
    real(dp) :: start, finish
 
    call MPI_Init(ierr)
-   call initialize_MPI_grid()
-   call init_arrays()
+   call create_mpi_domain()
+   call initialize_halo_buffers()
 
    call determine_rank_boundaries()
 
@@ -32,7 +32,7 @@ program sendrecv_3D
    do i = 1, iterations
 
       call update_mpi_halo(array=array)
-      call apply_boundaries(array=array, bc_types=boundaries)
+      call update_boundary_conditions(array=array, bc_types=boundaries)
 
       call check_halo_real(array=array)
       call check_boundary_real(array=array)

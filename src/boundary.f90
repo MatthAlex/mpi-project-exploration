@@ -13,12 +13,11 @@ module boundary
    use enums, only: D_WEST, D_EAST, D_SOUTH, D_NORTH, D_LOW, D_HIGH, PERIODIC, DIRICHLET, NEUMANN
    implicit none(type, external)
    private
-   public :: determine_rank_boundaries, apply_boundaries
-   public :: is_rank_inside, is_bc_face
+   public :: determine_rank_boundaries, update_boundary_conditions
 
-   logical :: is_bc_face(6)
+   logical, protected, public :: is_bc_face(6)
       !! Indicates if the local rank is a physical boundary, for each face.
-   logical :: is_rank_inside
+   logical, protected, public :: is_rank_inside
       !! Indicates if this rank is completely inside (no boundary faces).
    logical, parameter :: DEBUG = .true.
       !! Print verbose debug statements
@@ -43,7 +42,7 @@ contains
 
    !> Applies boundary conditions to each boundary face of the local domain,
    !> only when the face belongs to the physical boundary.
-   subroutine apply_boundaries(array, bc_types)
+   subroutine update_boundary_conditions(array, bc_types)
       use lib_parameters, only: dirichlet_value
       real(kind=sp), contiguous, intent(in out) :: array(:, :, :)
          !! Source array to update boundary conditions
@@ -62,18 +61,18 @@ contains
             ! Periodic is handled by MPI
             cycle
          case (DIRICHLET)
-            call apply_dirichlet(array, face, constant_value=dirichlet_value)
+            call apply_dirichlet_bc(array, face, constant_value=dirichlet_value)
          case (NEUMANN)
-            call apply_neumann(array, face)
+            call apply_neumann_bc(array, face)
          case default
             call apply_custom_bc(array, face)
          end select
       end do
 
-   end subroutine apply_boundaries
+   end subroutine update_boundary_conditions
 
    !> Applies a Dirichlet boundary condition by setting boundary cells to a constant.
-   subroutine apply_dirichlet(array, face, constant_value)
+   subroutine apply_dirichlet_bc(array, face, constant_value)
       real(kind=sp), contiguous, intent(in out) :: array(:, :, :)
       integer, intent(in) :: face
       real(kind=sp), intent(in) :: constant_value
@@ -99,10 +98,10 @@ contains
          if (DEBUG) write (*, '(2(A,1X,I0))') "BC DIRICHLET: Updating face", D_HIGH, " for rank:", rank
          array(:, :, ubound(array, 3)) = constant_value
       end select
-   end subroutine apply_dirichlet
+   end subroutine apply_dirichlet_bc
 
    !> Applies a Neumann boundary by copying data from the adjacent interior cell.
-   subroutine apply_neumann(array, face)
+   subroutine apply_neumann_bc(array, face)
       real(kind=sp), contiguous, intent(in out) :: array(:, :, :)
       integer, intent(in) :: face
 
@@ -114,7 +113,7 @@ contains
       case (D_LOW); array(:, :, 1) = array(:, :, 2)
       case (D_HIGH); array(:, :, ubound(array, 3)) = array(:, :, ubound(array, 3) - 1)
       end select
-   end subroutine apply_neumann
+   end subroutine apply_neumann_bc
 
    subroutine apply_custom_bc(array, face)
       real(kind=sp), intent(inout) :: array(:, :, :)
