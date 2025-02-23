@@ -8,7 +8,7 @@ module parameters
    public :: num_cells_x, num_cells_y, num_cells_z
    public :: iterations, boundaries, dirichlet_value, core_decomposition, dim_decomposition
 
-   integer, parameter :: num_cells = 5
+   integer, parameter :: num_cells = 16
    integer, parameter :: num_cells_x = num_cells
    integer, parameter :: num_cells_y = num_cells
    integer, parameter :: num_cells_z = num_cells
