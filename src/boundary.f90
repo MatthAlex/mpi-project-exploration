@@ -1,10 +1,6 @@
-!> Module for applying boundary conditions in a 3D MPI code.
-!>
-!> This module defines:
-!> - Named constants for each of the 6 directions in 3D
-!> - Internal variables for boundary faces
-!> - Routines to determine which faces belong to physical domain boundaries
-!> - Routines to apply various boundary conditions (Dirichlet, Neumann, etc.)
+!> Applies boundary conditions in a 3D MPI simulation.
+!> - Detects physical boundary faces per rank.
+!> - Supports periodic, Dirichlet, and Neumann conditions.
 module boundary
    use mpi_f08, only: MPI_PROC_NULL, MPI_Finalize
    use precision, only: sp

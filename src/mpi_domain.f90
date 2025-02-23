@@ -1,3 +1,6 @@
+!> Manages a 3D Cartesian grid for MPI-based simulations.
+!> - Creates and configures MPI Cartesian communicator.
+!> - Defines rank coordinates and nearest neighbors.
 module mpi_domain
    use mpi_f08, only: MPI_Cart_coords, MPI_Cart_create, MPI_Cart_shift, MPI_Comm_rank, MPI_Comm_size, MPI_Dims_create
    use mpi_f08, only: MPI_COMM_WORLD, MPI_SUCCESS, MPI_Comm

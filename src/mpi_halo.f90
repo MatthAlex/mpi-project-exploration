@@ -1,7 +1,6 @@
-!> Encapsulates MPI halo update functionality
-!> - static transfer buffers - avoid allocation every update
-!> - module procedure to generalise subroutine calling
-!> - independent dimensionality
+!> Handles halo region exchanges in a 3D MPI grid.
+!> - Provides static buffers for efficient transfers.
+!> - Supports real and integer array updates.
 module mpi_halo
    use mpi_f08, only: MPI_Sendrecv, MPI_STATUS, MPI_REAL, MPI_INTEGER
    use precision, only: sp

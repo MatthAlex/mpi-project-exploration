@@ -1,3 +1,5 @@
+!> Sets precision levels for numerical computations.
+!> - Defines single (sp) and double (dp) precision types.
 module precision
    use iso_fortran_env, only: real32, real64
    implicit none(type, external)

@@ -1,3 +1,5 @@
+!> Stores simulation parameters for a 3D MPI grid.
+!> - Defines grid dimensions, iterations, and boundary conditions.
 module parameters
    use precision, only: sp
    use enums, only: PERIODIC, DIRICHLET, NEUMANN

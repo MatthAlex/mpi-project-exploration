@@ -1,3 +1,5 @@
+!> Defines enumerations for 3D grid simulations.
+!> - Includes Cartesian directions and boundary condition types.
 module enums
    implicit none(type, external)
    private
