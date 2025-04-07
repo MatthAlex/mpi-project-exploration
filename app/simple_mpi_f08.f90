@@ -1,7 +1,9 @@
 program simple_mpi_f08
    use mpi_f08, only: MPI_Init, MPI_SUCCESS, MPI_COMM_WORLD, MPI_Status, MPI_Sendrecv, MPI_INTEGER
    use mpi_f08, only: MPI_Finalize, MPI_Barrier
-   use mpi_f08, only: MPI_Comm_size, MPI_Comm_rank
+   use mpi_f08, only: MPI_Comm_size, MPI_Comm_rank, MPI_Comm
+   use mpi_domain_types, only: mpi_domain_t
+   use enums, only: D_WEST, D_EAST
    implicit none (type, external)
 
    integer :: ierr
@@ -9,24 +11,32 @@ program simple_mpi_f08
    type(MPI_Status) :: status
    integer :: left, right, sendval, recvval
    integer, parameter :: tag = 1
-
+   type(mpi_domain_t) :: domain
+   type(MPI_Comm) :: comm
+   integer :: neighbors(6)
    ! Initialize MPI environment
    call MPI_Init(ierr)
    if (ierr /= MPI_SUCCESS) error stop "MPI initialization failed"
 
-   ! Get the number of processes
-   call MPI_Comm_size(MPI_COMM_WORLD, size, ierr)
-   if (ierr /= MPI_SUCCESS) error stop "Failed to get communicator size"
+   ! Initialize MPI by letting it choose the size
+   ! Also set periodic boundaries in X
+   call domain%initialize([4, 0, 0], [0, 0, 1, 1, 2, 2])
 
-   ! Get the rank of this process
-   call MPI_Comm_rank(MPI_COMM_WORLD, rank, ierr)
-   if (ierr /= MPI_SUCCESS) error stop "Failed to get rank"
+   ! Get only the required information
+   rank = domain%get_rank()
+   size = domain%get_size()
+   comm = domain%get_communicator()
+   neighbors = domain%get_neighbors()
 
-   ! Periodic boundary
-   left = rank - 1
-   if (left < 0) left = size - 1
-   right = rank + 1
-   if (right >= size) right = 0
+   left = neighbors(D_WEST)
+   right = neighbors(D_EAST)
+
+   ! Old periodic boundary implementation
+   ! ! Periodic boundary
+   ! left = rank - 1
+   ! if (left < 0) left = size - 1
+   ! right = rank + 1
+   ! if (right >= size) right = 0
 
    ! Print information about this process
    print '(3(a,1x,i0),1x,i0)', 'Hello from process ', rank, ' of ', size, ". My neighbours are:", left, right
@@ -37,19 +47,19 @@ program simple_mpi_f08
    ! Perform Sendrecv operation: send rank to right neighbor, receive from left neighbor
    call MPI_Sendrecv(sendval, 1, MPI_INTEGER, right, tag, &  ! Send to right
                      recvval, 1, MPI_INTEGER, left, tag, &  ! Receive from left
-                     MPI_COMM_WORLD, status, ierr)
+                     comm, status, ierr)
    if (ierr /= MPI_SUCCESS) error stop "Sendrecv failed"
    if (recvval /= left) error stop "Wrong value received from left"
 
 ! Perform Sendrecv operation: send rank to left neighbor, receive from right neighbor
    call MPI_Sendrecv(sendval, 1, MPI_INTEGER, left, tag, &  ! Send to left
                      recvval, 1, MPI_INTEGER, right, tag, &  ! Receive from right
-                     MPI_COMM_WORLD, status, ierr)
+                     comm, status, ierr)
    if (ierr /= MPI_SUCCESS) error stop "Sendrecv failed"
    if (recvval /= right) error stop "Wrong value received from right"
 
    ! Synchronize all processes
-   call MPI_Barrier(MPI_COMM_WORLD, ierr)
+   call MPI_Barrier(comm, ierr)
    if (ierr /= MPI_SUCCESS) error stop "Barrier failed"
 
    ! Finalize MPI Environment

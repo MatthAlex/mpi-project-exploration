@@ -33,6 +33,7 @@ module mpi_domain_types
       procedure, public :: get_communicator => get_domain_communicator
       procedure, public :: get_rank => get_domain_rank
       procedure, public :: get_neighbors => get_domain_neighbors
+      procedure, public :: get_size => get_domain_size
 
       procedure, private :: determine_neighbors
       procedure, private :: set_periodicity
@@ -154,6 +155,12 @@ contains
       integer :: neighbors_array(6)
       neighbors_array = self%neighbors
    end function get_domain_neighbors
+
+   module function get_domain_size(self) result(comm_size)
+      class(mpi_domain_t), intent(in) :: self
+      integer :: comm_size
+      comm_size = self%size
+   end function get_domain_size
 
    ! --- Old Subroutine Interface (Optional Wrapper) ---
    ! Can keep this for backward compatibility or simpler main program flow initially
