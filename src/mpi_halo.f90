@@ -10,11 +10,11 @@ module mpi_halo
    private
    public :: update_mpi_halo
 
-   integer, parameter :: TAG_X = 1
-   integer, parameter :: TAG_Y = 2
-   integer, parameter :: TAG_Z = 3
+   integer, parameter :: TAG_X = 1, TAG_Y = 2, TAG_Z = 3
+      !! MPI tags for X, Y, Z directions
 
    interface update_mpi_halo
+      !! Generic interface that wraps the real(sp) and integer routines
       module procedure update_mpi_halo_real
       module procedure update_mpi_halo_integer
    end interface
@@ -37,8 +37,8 @@ contains
       X_FACE_SIZE = (cells_y + 2) * (cells_z + 2)
       Y_FACE_SIZE = (cells_x + 2) * (cells_z + 2)
       Z_FACE_SIZE = (cells_x + 2) * (cells_y + 2)
-      allocate (buffer_send_x(cells_x + 2, cells_z + 2), buffer_rcv_x(cells_y + 2, cells_z + 2))
-      allocate (buffer_send_y(cells_y + 2, cells_z + 2), buffer_rcv_y(cells_x + 2, cells_z + 2))
+      allocate (buffer_send_x(cells_y + 2, cells_z + 2), buffer_rcv_x(cells_y + 2, cells_z + 2))
+      allocate (buffer_send_y(cells_x + 2, cells_z + 2), buffer_rcv_y(cells_x + 2, cells_z + 2))
 
       ! Exchange X direction; I send East halo to East neighbour, I receive West halo from West Neighbour
       buffer_send_x(:, :) = array(ubound(array, 1) - 1, :, :)
@@ -97,8 +97,8 @@ contains
       X_FACE_SIZE = (cells_y + 2) * (cells_z + 2)
       Y_FACE_SIZE = (cells_x + 2) * (cells_z + 2)
       Z_FACE_SIZE = (cells_x + 2) * (cells_y + 2)
-      allocate (buffer_send_x_int(cells_x + 2, cells_z + 2), buffer_rcv_x_int(cells_y + 2, cells_z + 2))
-      allocate (buffer_send_y_int(cells_y + 2, cells_z + 2), buffer_rcv_y_int(cells_x + 2, cells_z + 2))
+      allocate (buffer_send_x_int(cells_y + 2, cells_z + 2), buffer_rcv_x_int(cells_y + 2, cells_z + 2))
+      allocate (buffer_send_y_int(cells_x + 2, cells_z + 2), buffer_rcv_y_int(cells_x + 2, cells_z + 2))
 
       ! Exchange X direction; I send East halo to East neighbour, I receive West halo from West Neighbour
       buffer_send_x_int(:, :) = array(cells_x + 1, :, :)

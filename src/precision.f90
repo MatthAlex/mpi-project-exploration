@@ -6,5 +6,7 @@ module precision
    private
    public :: sp, dp
    integer, parameter :: sp = real32
+      !! Single-precision real kind - from ISO_FORTRAN_ENV module
    integer, parameter :: dp = real64
+      !! Double-precision real kind - from ISO_FORTRAN_ENV module
 end module precision

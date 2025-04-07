@@ -9,11 +9,16 @@ module parameters
    public :: iterations, boundaries, dirichlet_value, core_decomposition, dim_decomposition
 
    integer, parameter :: num_cells = 16
+      !! Rank-level number of cells in computational domain
    integer, parameter :: num_cells_x = num_cells
+      !! Rank-level number of cells in computational domain in X direction
    integer, parameter :: num_cells_y = num_cells
+      !! Rank-level number of cells in computational domain in Y direction
    integer, parameter :: num_cells_z = num_cells
+      !! Rank-level number of cells in computational domain in Z direction
 
    integer, parameter :: iterations = 2
+      !! Number of time steps
 
    integer, parameter :: boundaries(6) = [DIRICHLET, DIRICHLET, NEUMANN, NEUMANN, PERIODIC, PERIODIC]
       !! Boundaries for each face: West, East, South, North, Low, High

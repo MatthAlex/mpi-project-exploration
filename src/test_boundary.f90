@@ -1,3 +1,4 @@
+!> Helper module that defines how to assert validity for a boundary update
 module test_boundary
    use precision, only: sp
    use parameters, only: nx => num_cells_x, ny => num_cells_y, nz => num_cells_z, boundaries
