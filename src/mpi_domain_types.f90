@@ -1,6 +1,6 @@
 module mpi_domain_types
    use mpi_f08, only: MPI_Cart_coords, MPI_Cart_create, MPI_Cart_shift, MPI_Comm_rank, MPI_Comm_size, MPI_Dims_create
-   use mpi_f08, only: MPI_COMM_WORLD, MPI_SUCCESS, MPI_Comm, MPI_PROC_NULL
+   use mpi_f08, only: MPI_COMM_WORLD, MPI_SUCCESS, MPI_Comm, MPI_PROC_NULL, MPI_Abort
    implicit none(type, external)
    private
 
@@ -24,9 +24,9 @@ module mpi_domain_types
          !! Ranks of [W, E, S, N, L, H] neighbors
       logical :: reorder = .true.
          !! Core ranking may be reordered (`true`) or not (`false`)
-      logical :: is_boundary_face(6) = .false.
+      logical, public :: is_boundary_face(6) = .false.
          !! `True` if face is a physical boundary
-      logical :: is_interior = .true.
+      logical, public :: is_interior = .true.
          !! `True` if rank has no physical boundary faces
    contains
       procedure, public :: initialize => initialize_mpi_domain
@@ -34,6 +34,7 @@ module mpi_domain_types
       procedure, public :: get_rank => get_domain_rank
       procedure, public :: get_neighbors => get_domain_neighbors
       procedure, public :: get_size => get_domain_size
+      procedure, public :: abort => abort_mpi_processes
 
       procedure, private :: determine_neighbors
       procedure, private :: set_periodicity
@@ -171,4 +172,12 @@ contains
       call domain_instance%initialize(core_decomposition, boundaries)
    end subroutine create_mpi_domain
 
+   !> Aborts the MPI processes cleanly
+   module subroutine abort_mpi_processes(self, msg)
+      class(mpi_domain_t), intent(in) :: self
+      character(len=*) :: msg
+      integer :: ierr
+      print *, msg
+      call MPI_Abort(self%get_communicator(), ierr)
+   end subroutine abort_mpi_processes
 end module mpi_domain_types
