@@ -1,4 +1,4 @@
-name = "mpi"
+name = "mpi-cartesian-library"
 version = "2024.0.1"
 license = "LICENSE"
 author = "Matthew Alexandrakis"
