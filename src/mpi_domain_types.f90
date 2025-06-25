@@ -175,7 +175,7 @@ contains
    !> Aborts the MPI processes cleanly
    module subroutine abort_mpi_processes(self, msg)
       class(mpi_domain_t), intent(in) :: self
-      character(len=*) :: msg
+      character(len=*), intent(in) :: msg
       integer :: ierr
       print *, msg
       call MPI_Abort(self%get_communicator(), ierr)

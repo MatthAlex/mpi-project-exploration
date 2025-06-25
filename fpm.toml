@@ -29,5 +29,7 @@ main = "sendrecv_3D.f90"
 
 [extra.fortitude.check]
 preview = true
-select = ["E", "F", "M", "P", "S", "T"]
 line-length = 132
+ignore =[
+    "S232", # Whitespace included in 'in out'
+]

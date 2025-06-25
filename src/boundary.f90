@@ -42,7 +42,7 @@ contains
          case (DIRICHLET)
             call apply_dirichlet_bc(domain, array, face, constant_value=dirichlet_value)
          case (NEUMANN)
-            call apply_neumann_bc(array, face)
+            call apply_neumann_bc(domain, array, face)
          case default
             call domain%abort("BC Not implemented yet. Exiting..")
          end select
@@ -62,28 +62,31 @@ contains
       rank = domain%get_rank()
       select case (face)
       case (D_WEST)
-         if (DEBUG) write (*, '(2(A,1X,I0))') "BC DIRICHLET: Updating face", D_WEST, " for rank:", rank
+         if (DEBUG) write (*, "(2(A,1X,I0))") "BC DIRICHLET: Updating face", D_WEST, " for rank:", rank
          array(1, :, :) = constant_value
       case (D_EAST)
-         if (DEBUG) write (*, '(2(A,1X,I0))') "BC DIRICHLET: Updating face", D_EAST, " for rank:", rank
+         if (DEBUG) write (*, "(2(A,1X,I0))") "BC DIRICHLET: Updating face", D_EAST, " for rank:", rank
          array(ubound(array, 1), :, :) = constant_value
       case (D_SOUTH)
-         if (DEBUG) write (*, '(2(A,1X,I0))') "BC DIRICHLET: Updating face", D_SOUTH, " for rank:", rank
+         if (DEBUG) write (*, "(2(A,1X,I0))") "BC DIRICHLET: Updating face", D_SOUTH, " for rank:", rank
          array(:, 1, :) = constant_value
       case (D_NORTH)
-         if (DEBUG) write (*, '(2(A,1X,I0))') "BC DIRICHLET: Updating face", D_NORTH, " for rank:", rank
+         if (DEBUG) write (*, "(2(A,1X,I0))") "BC DIRICHLET: Updating face", D_NORTH, " for rank:", rank
          array(:, ubound(array, 2), :) = constant_value
       case (D_LOW)
-         if (DEBUG) write (*, '(2(A,1X,I0))') "BC DIRICHLET: Updating face", D_LOW, " for rank:", rank
+         if (DEBUG) write (*, "(2(A,1X,I0))") "BC DIRICHLET: Updating face", D_LOW, " for rank:", rank
          array(:, :, 1) = constant_value
       case (D_HIGH)
-         if (DEBUG) write (*, '(2(A,1X,I0))') "BC DIRICHLET: Updating face", D_HIGH, " for rank:", rank
+         if (DEBUG) write (*, "(2(A,1X,I0))") "BC DIRICHLET: Updating face", D_HIGH, " for rank:", rank
          array(:, :, ubound(array, 3)) = constant_value
+      case default
+            call domain%abort("Dirichlet boundary condition direction index not standard... Exiting..")
       end select
    end subroutine apply_dirichlet_bc
 
    !> Applies a Neumann boundary by copying data from the adjacent interior cell.
-   subroutine apply_neumann_bc(array, face)
+   subroutine apply_neumann_bc(domain, array, face)
+      class(mpi_domain_t), intent(in) :: domain
       real(kind=sp), contiguous, intent(in out) :: array(:, :, :)
       integer, intent(in) :: face
 
@@ -94,6 +97,8 @@ contains
       case (D_NORTH); array(:, ubound(array, 2), :) = array(:, ubound(array, 2) - 1, :)
       case (D_LOW); array(:, :, 1) = array(:, :, 2)
       case (D_HIGH); array(:, :, ubound(array, 3)) = array(:, :, ubound(array, 3) - 1)
+      case default
+         call domain%abort("Neumann boundary condition direction index not standard... Exiting..")
       end select
    end subroutine apply_neumann_bc
 

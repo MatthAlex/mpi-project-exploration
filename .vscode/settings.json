@@ -30,6 +30,7 @@
     // and doesn't search in them (inherits `files.exclude`)
     "search.exclude": {
         ".vscode/*": false,
+        "./docs/ford/*": true,
     },
     // and exclude them from the File Watcher
     "files.watcherExclude": {
