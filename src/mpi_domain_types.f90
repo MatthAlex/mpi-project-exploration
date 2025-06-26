@@ -98,8 +98,6 @@ contains
 
    end subroutine initialize_mpi_domain
 
-   ! --- Implement the private type-bound procedures ---
-
    !> Sets the periodic boundaries for the MPI Cartesian communicator, based on an array of boundary types.
    module subroutine set_periodicity(self, bc_types)
       use enums, only: X_DIR, Y_DIR, Z_DIR, D_WEST, D_EAST, D_SOUTH, D_NORTH, D_LOW, D_HIGH, PERIODIC

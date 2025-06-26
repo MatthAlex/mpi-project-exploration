@@ -22,7 +22,7 @@ program sendrecv_3D
    integer :: rank
    real(dp) :: start, finish
 
-   call MPI_Init(ierr)
+   call MPI_Init(ierror=ierr)
    call domain%initialize(core_decomposition, boundaries)
    rank = domain%get_rank()
    comm_cart = domain%get_communicator()
@@ -34,13 +34,15 @@ program sendrecv_3D
 
    start = MPI_WTime()
    do i = 1, iterations
-
+      if (rank == 0) print*, "Array"
       call update_mpi_halo(domain=domain, array=array)
       call update_boundary_conditions(domain=domain, array=array, bc_types=boundaries)
 
       call check_halo_real(domain=domain, array=array)
       call check_boundary_real(domain=domain, array=array)
 
+      call MPI_Barrier(comm=comm_cart, ierror=ierr)
+      if (rank == 0) print*, "Array smol"
       call update_mpi_halo(domain=domain, array=array_smol)
       call update_boundary_conditions(domain=domain, array=array_smol, bc_types=boundaries)
 
@@ -55,6 +57,6 @@ program sendrecv_3D
    ! Since the tests above pass
    if (rank == 0) print *, "Success!"
 
-   call MPI_Finalize(ierr)
+   call MPI_Finalize(ierror=ierr)
 
 end program sendrecv_3D
