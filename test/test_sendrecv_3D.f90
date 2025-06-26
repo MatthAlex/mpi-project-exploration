@@ -3,7 +3,7 @@
 !> - Can handle periodic boundaries with a boolean flag
 !> - Heuristics may reorder the original comm (CPU topology) into a more efficient one
 !> - Figures out who the neighbours are of each rank automatically
-program sendrecv_3D
+program test_sendrecv_3D
    use mpi_f08, only: MPI_Init, MPI_Barrier, MPI_Finalize, MPI_WTime, MPI_Comm
    use precision, only: sp, dp
    use mpi_domain_types, only: mpi_domain_t
@@ -59,4 +59,4 @@ program sendrecv_3D
 
    call MPI_Finalize(ierror=ierr)
 
-end program sendrecv_3D
+end program test_sendrecv_3D

@@ -1,4 +1,4 @@
-program simple_mpi_f08
+program test_simple_mpi_f08
    use mpi_f08, only: MPI_Init, MPI_SUCCESS, MPI_COMM_WORLD, MPI_Status, MPI_Sendrecv, MPI_INTEGER
    use mpi_f08, only: MPI_Finalize, MPI_Barrier
    use mpi_f08, only: MPI_Comm_size, MPI_Comm_rank, MPI_Comm
@@ -66,4 +66,4 @@ program simple_mpi_f08
    call MPI_Finalize(ierr)
    if (ierr /= MPI_SUCCESS) error stop "MPI finalization failed"
 
-end program simple_mpi_f08
+end program test_simple_mpi_f08
