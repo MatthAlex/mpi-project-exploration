@@ -27,13 +27,13 @@ contains
       if (is_bc_face(D_WEST)) then
          select case (boundaries(D_WEST))
          case (DIRICHLET)
-            if (any(abs(array(1, 2:size(array, 2)-1, 2:size(array, 3)-1) - dirichlet_value) > tolerance)) then
+            if (any(abs(array(1, 2:size(array, 2) - 1, 2:size(array, 3) - 1) - dirichlet_value) > tolerance)) then
                call domain%abort("TEST Boundary: Not OK: West face Dirichlet")
             end if
          case (NEUMANN)
-            if (any(abs(array(1, 2:size(array, 2)-1, 2:size(array, 3)-1) - &
-                        array(2, 2:size(array, 2)-1, 2:size(array, 3)-1)) > tolerance)) then
-              call domain%abort("TEST Boundary: Not OK: West face Neumann")
+            if (any(abs(array(1, 2:size(array, 2) - 1, 2:size(array, 3) - 1) - &
+                        array(2, 2:size(array, 2) - 1, 2:size(array, 3) - 1)) > tolerance)) then
+               call domain%abort("TEST Boundary: Not OK: West face Neumann")
             end if
          case default
             call domain%abort("TEST Boundary: Boundary Condition index not recognized... Exiting..")
@@ -44,13 +44,13 @@ contains
       if (is_bc_face(D_EAST)) then
          select case (boundaries(D_EAST))
          case (DIRICHLET)
-            if (any(abs(array(ubound(array, 1), 2:size(array, 2)-1, 2:size(array, 3)-1) - dirichlet_value) > tolerance)) then
-              call domain%abort("TEST Boundary: Not OK: East face Dirichlet")
+            if (any(abs(array(ubound(array, 1), 2:size(array, 2) - 1, 2:size(array, 3) - 1) - dirichlet_value) > tolerance)) then
+               call domain%abort("TEST Boundary: Not OK: East face Dirichlet")
             end if
          case (NEUMANN)
-            if (any(abs(array(ubound(array, 1), 2:size(array, 2)-1, 2:size(array, 3)-1) - &
-                        array(ubound(array, 1) - 1, 2:size(array, 2)-1, 2:size(array, 3)-1)) > tolerance)) then
-              call domain%abort("TEST Boundary: Not OK: East face Neumann")
+            if (any(abs(array(ubound(array, 1), 2:size(array, 2) - 1, 2:size(array, 3) - 1) - &
+                        array(ubound(array, 1) - 1, 2:size(array, 2) - 1, 2:size(array, 3) - 1)) > tolerance)) then
+               call domain%abort("TEST Boundary: Not OK: East face Neumann")
             end if
          case default
             call domain%abort("TEST Boundary: Boundary Condition index not recognized... Exiting..")
@@ -61,13 +61,13 @@ contains
       if (is_bc_face(D_SOUTH)) then
          select case (boundaries(D_SOUTH))
          case (DIRICHLET)
-            if (any(abs(array(2:size(array, 1)-1, 1, 2:size(array, 3)-1) - dirichlet_value) > tolerance)) then
-              call domain%abort("TEST Boundary: Not OK: South face Dirichlet")
+            if (any(abs(array(2:size(array, 1) - 1, 1, 2:size(array, 3) - 1) - dirichlet_value) > tolerance)) then
+               call domain%abort("TEST Boundary: Not OK: South face Dirichlet")
             end if
          case (NEUMANN)
-            if (any(abs(array(2:size(array, 1)-1, 1, 2:size(array, 3)-1) - &
-                        array(2:size(array, 1)-1, 2, 2:size(array, 3)-1)) > tolerance)) then
-              call domain%abort("TEST Boundary: Not OK: South face Neumann")
+            if (any(abs(array(2:size(array, 1) - 1, 1, 2:size(array, 3) - 1) - &
+                        array(2:size(array, 1) - 1, 2, 2:size(array, 3) - 1)) > tolerance)) then
+               call domain%abort("TEST Boundary: Not OK: South face Neumann")
             end if
          case default
             call domain%abort("TEST Boundary: Boundary Condition index not recognized... Exiting..")
@@ -78,13 +78,13 @@ contains
       if (is_bc_face(D_NORTH)) then
          select case (boundaries(D_NORTH))
          case (DIRICHLET)
-            if (any(abs(array(2:size(array, 1)-1, ubound(array, 2), 2:size(array, 3)-1) - dirichlet_value) > tolerance)) then
-              call domain%abort("TEST Boundary: Not OK: North face Dirichlet")
+            if (any(abs(array(2:size(array, 1) - 1, ubound(array, 2), 2:size(array, 3) - 1) - dirichlet_value) > tolerance)) then
+               call domain%abort("TEST Boundary: Not OK: North face Dirichlet")
             end if
          case (NEUMANN)
-            if (any(abs(array(2:size(array, 1)-1, ubound(array, 2), 2:size(array, 3)-1) - &
-                        array(2:size(array, 1)-1, ubound(array, 2) - 1, 2:size(array, 3)-1)) > tolerance)) then
-              call domain%abort("TEST Boundary: Not OK: North face Neumann")
+            if (any(abs(array(2:size(array, 1) - 1, ubound(array, 2), 2:size(array, 3) - 1) - &
+                        array(2:size(array, 1) - 1, ubound(array, 2) - 1, 2:size(array, 3) - 1)) > tolerance)) then
+               call domain%abort("TEST Boundary: Not OK: North face Neumann")
             end if
          case default
             call domain%abort("TEST Boundary: Boundary Condition index not recognized... Exiting..")
@@ -95,13 +95,13 @@ contains
       if (is_bc_face(D_LOW)) then
          select case (boundaries(D_LOW))
          case (DIRICHLET)
-            if (any(abs(array(2:size(array, 1)-1, 2:size(array, 2)-1, 1) - dirichlet_value) > tolerance)) then
-              call domain%abort("TEST Boundary: Not OK: Low face Dirichlet")
+            if (any(abs(array(2:size(array, 1) - 1, 2:size(array, 2) - 1, 1) - dirichlet_value) > tolerance)) then
+               call domain%abort("TEST Boundary: Not OK: Low face Dirichlet")
             end if
          case (NEUMANN)
-            if (any(abs(array(2:size(array, 1)-1, 2:size(array, 2)-1, 1) - &
-                        array(2:size(array, 1)-1, 2:size(array, 2)-1, 2)) > tolerance)) then
-              call domain%abort("TEST Boundary: Not OK: Low face Neumann")
+            if (any(abs(array(2:size(array, 1) - 1, 2:size(array, 2) - 1, 1) - &
+                        array(2:size(array, 1) - 1, 2:size(array, 2) - 1, 2)) > tolerance)) then
+               call domain%abort("TEST Boundary: Not OK: Low face Neumann")
             end if
          case default
             call domain%abort("TEST Boundary: Boundary Condition index not recognized... Exiting..")
@@ -112,13 +112,13 @@ contains
       if (is_bc_face(D_HIGH)) then
          select case (boundaries(D_HIGH))
          case (DIRICHLET)
-            if (any(abs(array(2:size(array, 1)-1, 2:size(array, 2)-1, ubound(array, 3)) - dirichlet_value) > tolerance)) then
-              call domain%abort("TEST Boundary: Not OK: High face Dirichlet")
+            if (any(abs(array(2:size(array, 1) - 1, 2:size(array, 2) - 1, ubound(array, 3)) - dirichlet_value) > tolerance)) then
+               call domain%abort("TEST Boundary: Not OK: High face Dirichlet")
             end if
          case (NEUMANN)
-            if (any(abs(array(2:size(array, 1)-1, 2:size(array, 2)-1, ubound(array, 3)) - &
-                        array(2:size(array, 1)-1, 2:size(array, 2)-1, ubound(array, 3) - 1)) > tolerance)) then
-              call domain%abort("TEST Boundary: Not OK: High face Neumann")
+            if (any(abs(array(2:size(array, 1) - 1, 2:size(array, 2) - 1, ubound(array, 3)) - &
+                        array(2:size(array, 1) - 1, 2:size(array, 2) - 1, ubound(array, 3) - 1)) > tolerance)) then
+               call domain%abort("TEST Boundary: Not OK: High face Neumann")
             end if
          case default
             call domain%abort("TEST Boundary: Boundary Condition index not recognized... Exiting..")

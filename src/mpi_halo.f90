@@ -23,16 +23,16 @@ contains
 
    subroutine update_mpi_halo_real_facade(domain, array)
       class(mpi_domain_t), intent(in) :: domain
-      real(sp), contiguous, intent(inout) :: array(:,:,:)
+      real(sp), contiguous, intent(inout) :: array(:, :, :)
 
-      call update_mpi_halo_real(domain, array, size(array,1), size(array,2), size(array,3))
+      call update_mpi_halo_real(domain, array, size(array, 1), size(array, 2), size(array, 3))
    end subroutine update_mpi_halo_real_facade
 
    subroutine update_mpi_halo_integer_facade(domain, array)
       class(mpi_domain_t), intent(in) :: domain
-      integer, contiguous, intent(inout) :: array(:,:,:)
+      integer, contiguous, intent(inout) :: array(:, :, :)
 
-      call update_mpi_halo_integer(domain, array, size(array,1), size(array,2), size(array,3))
+      call update_mpi_halo_integer(domain, array, size(array, 1), size(array, 2), size(array, 3))
    end subroutine update_mpi_halo_integer_facade
 
    !> Perform halo exchanges with nearest neighbors, in all 3 directions, for an array of kind sp

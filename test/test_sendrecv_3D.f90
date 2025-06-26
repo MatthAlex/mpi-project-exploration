@@ -12,7 +12,7 @@ program test_sendrecv_3D
    use test_halo, only: check_halo_real
    use test_boundary, only: check_boundary_real
    use boundary, only: update_boundary_conditions
-   implicit none (type, external)
+   implicit none(type, external)
 
    type(mpi_domain_t) :: domain
    type(MPI_Comm) :: comm_cart
@@ -30,11 +30,11 @@ program test_sendrecv_3D
    ! Create a local array with halo regions
    allocate (array(0:nx + 1, 0:ny + 1, 0:nz + 1), source=real(rank, kind=sp))
    ! Create a local array with halo regions of different size
-   allocate (array_smol(0:nx/4 + 1, 0:ny/4 + 1, 0:nz/4 + 1), source=real(rank, kind=sp))
+   allocate (array_smol(0:nx / 4 + 1, 0:ny / 4 + 1, 0:nz / 4 + 1), source=real(rank, kind=sp))
 
    start = MPI_WTime()
    do i = 1, iterations
-      if (rank == 0) print*, "Array"
+      if (rank == 0) print *, "Array"
       call update_mpi_halo(domain=domain, array=array)
       call update_boundary_conditions(domain=domain, array=array, bc_types=boundaries)
 
@@ -42,7 +42,7 @@ program test_sendrecv_3D
       call check_boundary_real(domain=domain, array=array)
 
       call MPI_Barrier(comm=comm_cart, ierror=ierr)
-      if (rank == 0) print*, "Array smol"
+      if (rank == 0) print *, "Array smol"
       call update_mpi_halo(domain=domain, array=array_smol)
       call update_boundary_conditions(domain=domain, array=array_smol, bc_types=boundaries)
 

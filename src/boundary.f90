@@ -80,7 +80,7 @@ contains
          if (DEBUG) write (*, "(2(A,1X,I0))") "BC DIRICHLET: Updating face", D_HIGH, " for rank:", rank
          array(:, :, ubound(array, 3)) = constant_value
       case default
-            call domain%abort("Dirichlet boundary condition direction index not standard... Exiting..")
+         call domain%abort("Dirichlet boundary condition direction index not standard... Exiting..")
       end select
    end subroutine apply_dirichlet_bc
 

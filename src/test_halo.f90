@@ -25,29 +25,29 @@ contains
          if (is_bc_face(face)) cycle
 
          select case (face)
-         case(D_WEST)
-            if (any(int(array(1, 2:size(array, 2)-1, 2:size(array, 3)-1)) /= neighbors(D_WEST))) then
-              call domain%abort("TEST HALO: Not OK in west")
+         case (D_WEST)
+            if (any(int(array(1, 2:size(array, 2) - 1, 2:size(array, 3) - 1)) /= neighbors(D_WEST))) then
+               call domain%abort("TEST HALO: Not OK in west")
             end if
-         case(D_EAST)
-            if (any(int(array(size(array, 1), 2:size(array, 2)-1, 2:size(array, 3)-1)) /= neighbors(D_EAST))) then
-              call domain%abort("TEST HALO: Not OK in east")
+         case (D_EAST)
+            if (any(int(array(size(array, 1), 2:size(array, 2) - 1, 2:size(array, 3) - 1)) /= neighbors(D_EAST))) then
+               call domain%abort("TEST HALO: Not OK in east")
             end if
-         case(D_SOUTH)
-            if (any(int(array(2:size(array, 1)-1, 1, 2:size(array, 3)-1)) /= neighbors(D_SOUTH))) then
-              call domain%abort("TEST HALO: Not OK in south")
+         case (D_SOUTH)
+            if (any(int(array(2:size(array, 1) - 1, 1, 2:size(array, 3) - 1)) /= neighbors(D_SOUTH))) then
+               call domain%abort("TEST HALO: Not OK in south")
             end if
-         case(D_NORTH)
-            if (any(int(array(2:size(array, 1)-1, size(array, 2), 2:size(array, 3)-1)) /= neighbors(D_NORTH))) then
-              call domain%abort("TEST HALO: Not OK in north")
+         case (D_NORTH)
+            if (any(int(array(2:size(array, 1) - 1, size(array, 2), 2:size(array, 3) - 1)) /= neighbors(D_NORTH))) then
+               call domain%abort("TEST HALO: Not OK in north")
             end if
-         case(D_LOW)
-            if (any(int(array(2:size(array, 1)-1, 2:size(array, 2)-1, 1)) /= neighbors(D_LOW))) then
-              call domain%abort("TEST HALO: Not OK in low")
+         case (D_LOW)
+            if (any(int(array(2:size(array, 1) - 1, 2:size(array, 2) - 1, 1)) /= neighbors(D_LOW))) then
+               call domain%abort("TEST HALO: Not OK in low")
             end if
-         case(D_HIGH)
-            if (any(int(array(2:size(array, 1)-1, 2:size(array, 2)-1, size(array, 3))) /= neighbors(D_HIGH))) then
-              call domain%abort("TEST HALO: Not OK in high")
+         case (D_HIGH)
+            if (any(int(array(2:size(array, 1) - 1, 2:size(array, 2) - 1, size(array, 3))) /= neighbors(D_HIGH))) then
+               call domain%abort("TEST HALO: Not OK in high")
             end if
          case default
             call domain%abort("TEST HALO: Wrong direction index")
