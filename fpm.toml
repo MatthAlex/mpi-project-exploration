@@ -22,11 +22,6 @@ source-form = "free"
 [dependencies]
 mpi = "*"
 
-[[executable]]
-name = "sendrecv_3D"
-source-dir = "app"
-main = "sendrecv_3D.f90"
-
 [extra.fortitude.check]
 preview = true
 line-length = 132
