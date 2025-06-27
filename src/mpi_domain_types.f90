@@ -1,5 +1,5 @@
 module mpi_domain_types
-   use mpi_f08, only: MPI_Cart_coords, MPI_Cart_create, MPI_Cart_shift, MPI_Comm_rank, MPI_Comm_size, MPI_Dims_create
+   use mpi_f08, only: MPI_Cart_coords, MPI_Cart_create, MPI_Cart_shift, MPI_Comm_rank, MPI_Comm_size, MPI_Dims_create, MPI_Cart_rank
    use mpi_f08, only: MPI_COMM_WORLD, MPI_SUCCESS, MPI_Comm, MPI_PROC_NULL, MPI_Abort
    implicit none(type, external)
    private
@@ -22,6 +22,7 @@ module mpi_domain_types
          !! Periodicity per dimension
       integer :: neighbors(6) = MPI_PROC_NULL
          !! Ranks of [W, E, S, N, L, H] neighbors
+      integer :: neighbors_extended(-1:1, -1:1, -1:1) = MPI_PROC_NULL
       logical :: reorder = .true.
          !! Core ranking may be reordered (`true`) or not (`false`)
       logical, public :: is_boundary_face(6) = .false.
@@ -35,6 +36,8 @@ module mpi_domain_types
       procedure, public :: get_neighbors => get_domain_neighbors
       procedure, public :: get_size => get_domain_size
       procedure, public :: abort => abort_mpi_processes
+      procedure, public :: determine_extended_neighbors
+      procedure, public :: test_extended_neighbors
 
       procedure, private :: determine_neighbors
       procedure, private :: set_periodicity
@@ -44,6 +47,15 @@ module mpi_domain_types
    ! Public interface remains, but implementation changes
    public :: create_mpi_domain ! Maybe rename to initialize_mpi_domain or similar
 
+   interface
+      module subroutine determine_extended_neighbors(self)
+         class(mpi_domain_t), intent(inout) :: self
+      end subroutine determine_extended_neighbors
+
+      module subroutine test_extended_neighbors(self)
+         class(mpi_domain_t), intent(in) :: self
+      end subroutine test_extended_neighbors
+   end interface
 contains
 
    !> Subroutine to initialize the type instance
