@@ -44,9 +44,6 @@ module mpi_domain_types
       procedure, private :: check_physical_boundaries
    end type mpi_domain_t
 
-   ! Public interface remains, but implementation changes
-   public :: create_mpi_domain ! Maybe rename to initialize_mpi_domain or similar
-
    interface
       module subroutine determine_extended_neighbors(self)
          class(mpi_domain_t), intent(inout) :: self
@@ -172,15 +169,6 @@ contains
       integer :: comm_size
       comm_size = self%size
    end function get_domain_size
-
-   ! --- Old Subroutine Interface (Optional Wrapper) ---
-   ! Can keep this for backward compatibility or simpler main program flow initially
-   module subroutine create_mpi_domain(domain_instance)
-      use parameters, only: core_decomposition, boundaries
-      type(mpi_domain_t), intent(out) :: domain_instance
-      ! Call the type-bound initializer
-      call domain_instance%initialize(core_decomposition, boundaries)
-   end subroutine create_mpi_domain
 
    !> Aborts the MPI processes cleanly
    module subroutine abort_mpi_processes(self, msg)
