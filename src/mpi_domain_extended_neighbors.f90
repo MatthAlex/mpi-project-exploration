@@ -93,7 +93,7 @@ contains
                   expected = MPI_PROC_NULL
                else
                   call MPI_Cart_rank(self%comm, tmpc, expected, ierr)
-                  if (ierr /= MPI_SUCCESS) call MPI_Abort(self%comm, ierr)
+                  if (ierr /= MPI_SUCCESS) call self%abort("MPI_Cart_rank failed in finding extended neighbors.. Exiting..")
                end if
 
                if (actual /= expected) then

@@ -1,5 +1,5 @@
 program test_simple_mpi_f08
-   use mpi_f08, only: MPI_Init, MPI_SUCCESS, MPI_COMM_WORLD, MPI_Status, MPI_Sendrecv, MPI_INTEGER
+   use mpi_f08, only: MPI_Init, MPI_SUCCESS, MPI_Status, MPI_Sendrecv, MPI_INTEGER
    use mpi_f08, only: MPI_Finalize, MPI_Barrier
    use mpi_f08, only: MPI_Comm_size, MPI_Comm_rank, MPI_Comm
    use mpi_domain_types, only: mpi_domain_t
@@ -14,9 +14,8 @@ program test_simple_mpi_f08
    type(mpi_domain_t) :: domain
    type(MPI_Comm) :: comm
    integer :: neighbors(6)
-   ! Initialize MPI environment
+
    call MPI_Init(ierr)
-   if (ierr /= MPI_SUCCESS) error stop "MPI initialization failed"
 
    ! Initialize MPI by letting it choose the size
    ! Also set periodic boundaries in X
@@ -48,22 +47,22 @@ program test_simple_mpi_f08
    call MPI_Sendrecv(sendval, 1, MPI_INTEGER, right, tag, &  ! Send to right
                      recvval, 1, MPI_INTEGER, left, tag, &  ! Receive from left
                      comm, status, ierr)
-   if (ierr /= MPI_SUCCESS) error stop "Sendrecv failed"
-   if (recvval /= left) error stop "Wrong value received from left"
+   if (ierr /= MPI_SUCCESS) call domain%abort("Sendrecv failed")
+   if (recvval /= left) call domain%abort("Wrong value received from left")
 
 ! Perform Sendrecv operation: send rank to left neighbor, receive from right neighbor
    call MPI_Sendrecv(sendval, 1, MPI_INTEGER, left, tag, &  ! Send to left
                      recvval, 1, MPI_INTEGER, right, tag, &  ! Receive from right
                      comm, status, ierr)
-   if (ierr /= MPI_SUCCESS) error stop "Sendrecv failed"
-   if (recvval /= right) error stop "Wrong value received from right"
+   if (ierr /= MPI_SUCCESS) call domain%abort("Sendrecv failed")
+   if (recvval /= right) call domain%abort("Wrong value received from right")
 
    ! Synchronize all processes
    call MPI_Barrier(comm, ierr)
-   if (ierr /= MPI_SUCCESS) error stop "Barrier failed"
+   if (ierr /= MPI_SUCCESS) call domain%abort("Barrier failed")
 
    ! Finalize MPI Environment
    call MPI_Finalize(ierr)
-   if (ierr /= MPI_SUCCESS) error stop "MPI finalization failed"
+   if (ierr /= MPI_SUCCESS) call domain%abort("MPI finalization failed")
 
 end program test_simple_mpi_f08
