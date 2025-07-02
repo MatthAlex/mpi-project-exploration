@@ -2,7 +2,7 @@
 program test_sendrecv_1D
    use mpi, only: MPI_Init, MPI_Comm_rank, MPI_Comm_size, MPI_Sendrecv, MPI_Finalize
    use mpi, only: MPI_COMM_WORLD, MPI_STATUS_SIZE, MPI_REAL
-   use precision, only: sp
+   use lib_mpi_precision, only: sp
    implicit none(type, external)
 
    integer :: ierr, rank, comsize

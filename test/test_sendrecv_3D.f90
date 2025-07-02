@@ -5,9 +5,9 @@
 !> - Figures out who the neighbours are of each rank automatically
 program test_sendrecv_3D
    use mpi_f08, only: MPI_Init, MPI_Barrier, MPI_Finalize, MPI_WTime, MPI_Comm
-   use precision, only: sp, dp
+   use lib_mpi_precision, only: sp, dp
    use mpi_domain_types, only: mpi_domain_t
-   use parameters, only: nx => num_cells_x, ny => num_cells_y, nz => num_cells_z, iterations, boundaries, core_decomposition
+   use lib_mpi_parameters, only: nx => num_cells_x, ny => num_cells_y, nz => num_cells_z, iterations, boundaries, core_decomposition
    use mpi_halo, only: update_mpi_halo
    use test_halo, only: check_halo_real
    use test_boundary, only: check_boundary_real

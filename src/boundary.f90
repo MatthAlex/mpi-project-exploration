@@ -3,10 +3,10 @@
 !> - Supports periodic, Dirichlet, and Neumann conditions.
 module boundary
    use mpi_f08, only: MPI_Abort, MPI_COMM_WORLD
-   use precision, only: sp
+   use lib_mpi_precision, only: sp
    use mpi_domain_types, only: mpi_domain_t
-   use parameters, only: boundaries, nx => num_cells_x, ny => num_cells_y, nz => num_cells_z
-   use enums, only: D_WEST, D_EAST, D_SOUTH, D_NORTH, D_LOW, D_HIGH, PERIODIC, DIRICHLET, NEUMANN
+   use lib_mpi_parameters, only: boundaries, nx => num_cells_x, ny => num_cells_y, nz => num_cells_z
+   use lib_mpi_enums, only: D_WEST, D_EAST, D_SOUTH, D_NORTH, D_LOW, D_HIGH, PERIODIC, DIRICHLET, NEUMANN
    implicit none(type, external)
    private
    public :: update_boundary_conditions
@@ -18,7 +18,7 @@ contains
    !> Applies boundary conditions to each boundary face of the local domain,
    !> only when the face belongs to the physical boundary.
    subroutine update_boundary_conditions(domain, array, bc_types)
-      use parameters, only: dirichlet_value
+      use lib_mpi_parameters, only: dirichlet_value
       class(mpi_domain_t), intent(in) :: domain
       real(kind=sp), contiguous, intent(in out) :: array(:, :, :)
          !! Source array to update boundary conditions

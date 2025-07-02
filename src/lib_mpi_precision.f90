@@ -1,6 +1,6 @@
 !> Sets precision levels for numerical computations.
 !> - Defines single (sp) and double (dp) precision types.
-module precision
+module lib_mpi_precision
    use, intrinsic :: iso_fortran_env, only: real32, real64
    implicit none(type, external)
    private
@@ -9,4 +9,4 @@ module precision
       !! Single-precision real kind - from ISO_FORTRAN_ENV module
    integer, parameter :: dp = real64
       !! Double-precision real kind - from ISO_FORTRAN_ENV module
-end module precision
+end module lib_mpi_precision

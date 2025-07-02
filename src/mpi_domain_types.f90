@@ -109,7 +109,7 @@ contains
 
    !> Sets the periodic boundaries for the MPI Cartesian communicator, based on an array of boundary types.
    module subroutine set_periodicity(self, bc_types)
-      use enums, only: X_DIR, Y_DIR, Z_DIR, D_WEST, D_EAST, D_SOUTH, D_NORTH, D_LOW, D_HIGH, PERIODIC
+      use lib_mpi_enums, only: X_DIR, Y_DIR, Z_DIR, D_WEST, D_EAST, D_SOUTH, D_NORTH, D_LOW, D_HIGH, PERIODIC
       class(mpi_domain_t), intent(inout) :: self
       integer, intent(in) :: bc_types(6)
 
@@ -123,7 +123,7 @@ contains
 
    !> Finds the ranks of the 6 nearest neighbors by shifting ±1 in X, Y, and Z.
    module subroutine determine_neighbors(self)
-      use enums, only: X_DIR, Y_DIR, Z_DIR
+      use lib_mpi_enums, only: X_DIR, Y_DIR, Z_DIR
       class(mpi_domain_t), intent(in out) :: self
       integer :: ierr, west, east, south, north, low, high
       ! Logic from original get_neighbors

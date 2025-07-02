@@ -3,7 +3,7 @@ program test_simple_mpi_f08
    use mpi_f08, only: MPI_Finalize, MPI_Barrier
    use mpi_f08, only: MPI_Comm_size, MPI_Comm_rank, MPI_Comm
    use mpi_domain_types, only: mpi_domain_t
-   use enums, only: D_WEST, D_EAST
+   use lib_mpi_enums, only: D_WEST, D_EAST
    implicit none(type, external)
 
    integer :: ierr

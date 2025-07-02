@@ -1,8 +1,8 @@
 !> Stores simulation parameters for a 3D MPI grid.
 !> - Defines grid dimensions, iterations, and boundary conditions.
-module parameters
-   use precision, only: sp
-   use enums, only: PERIODIC, DIRICHLET, NEUMANN
+module lib_mpi_parameters
+   use lib_mpi_precision, only: sp
+   use lib_mpi_enums, only: PERIODIC, DIRICHLET, NEUMANN
    implicit none(type, external)
    private
    public :: num_cells_x, num_cells_y, num_cells_z
@@ -29,4 +29,4 @@ module parameters
 
    real(kind=sp), parameter :: dirichlet_value = -1.0_sp
       !! Dirichlet Boundary Condition value
-end module parameters
+end module lib_mpi_parameters

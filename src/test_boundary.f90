@@ -1,9 +1,9 @@
 !> Helper module that defines how to assert validity for a boundary update
 module test_boundary
    use mpi_domain_types, only: mpi_domain_t
-   use parameters, only: nx => num_cells_x, ny => num_cells_y, nz => num_cells_z, boundaries
-   use precision, only: sp
-   use enums, only: D_WEST, D_EAST, D_SOUTH, D_NORTH, D_LOW, D_HIGH, PERIODIC, DIRICHLET, NEUMANN
+   use lib_mpi_parameters, only: nx => num_cells_x, ny => num_cells_y, nz => num_cells_z, boundaries
+   use lib_mpi_precision, only: sp
+   use lib_mpi_enums, only: D_WEST, D_EAST, D_SOUTH, D_NORTH, D_LOW, D_HIGH, PERIODIC, DIRICHLET, NEUMANN
    implicit none(type, external)
    private
    public :: check_boundary_real
@@ -15,7 +15,7 @@ contains
    !> - Dirichlet (1): Should be constant value 1.0
    !> - Neumann (2): Should match adjacent interior cell
    subroutine check_boundary_real(domain, array)
-      use parameters, only: dirichlet_value
+      use lib_mpi_parameters, only: dirichlet_value
       class(mpi_domain_t), intent(in) :: domain
       real(kind=sp), dimension(:, :, :), intent(in) :: array
       real(kind=sp), parameter :: tolerance = 1.0e-10_sp
