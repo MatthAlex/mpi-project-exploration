@@ -35,6 +35,7 @@ module mpi_domain_types
       procedure, public :: get_rank => get_domain_rank
       procedure, public :: get_neighbors => get_domain_neighbors
       procedure, public :: get_size => get_domain_size
+      procedure, public :: get_coords => get_decomposition_coords
       procedure, public :: get_dims => get_domain_dims
       procedure, public :: abort => abort_mpi_processes
       procedure, public :: determine_extended_neighbors
@@ -170,6 +171,12 @@ contains
       integer :: comm_size
       comm_size = self%size
    end function get_domain_size
+
+   module function get_decomposition_coords(self) result(coordinates)
+      class(mpi_domain_t), intent(in) :: self
+      integer :: coordinates(3)
+      coordinates = self%coords
+   end function get_decomposition_coords
 
    module function get_domain_dims(self) result(requested_dims)
       class(mpi_domain_t), intent(in) :: self
