@@ -11,7 +11,7 @@ program test_sendrecv_3D
    use mpi_halo, only: update_mpi_halo
    use test_halo, only: check_halo_real
    use test_boundary, only: check_boundary_real
-   use boundary, only: update_boundary_conditions
+   use boundary, only: update_boundaries
    implicit none(type, external)
 
    type(mpi_domain_t) :: domain
@@ -36,7 +36,7 @@ program test_sendrecv_3D
    do i = 1, iterations
       if (rank == 0) print *, "Array"
       call update_mpi_halo(domain=domain, array=array)
-      call update_boundary_conditions(domain=domain, array=array, bc_types=boundaries)
+      call update_boundaries(domain=domain, array=array, bc_types=boundaries)
 
       call check_halo_real(domain=domain, array=array)
       call check_boundary_real(domain=domain, array=array)
@@ -44,7 +44,7 @@ program test_sendrecv_3D
       call MPI_Barrier(comm=comm_cart, ierror=ierr)
       if (rank == 0) print *, "Array smol"
       call update_mpi_halo(domain=domain, array=array_smol)
-      call update_boundary_conditions(domain=domain, array=array_smol, bc_types=boundaries)
+      call update_boundaries(domain=domain, array=array_smol, bc_types=boundaries)
 
       call check_halo_real(domain=domain, array=array_smol)
       call check_boundary_real(domain=domain, array=array_smol)
