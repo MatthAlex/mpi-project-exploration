@@ -37,6 +37,8 @@ module mpi_domain_types
       procedure, public :: get_size => get_domain_size
       procedure, public :: get_coords => get_decomposition_coords
       procedure, public :: get_dims => get_domain_dims
+      procedure, public :: get_periodicity => get_periodic_dims
+      procedure, public :: coords_to_rank
       procedure, public :: abort => abort_mpi_processes
       procedure, public :: determine_extended_neighbors
       procedure, public :: test_extended_neighbors
@@ -183,6 +185,25 @@ contains
       integer :: requested_dims(3)
       requested_dims = self%dims
    end function get_domain_dims
+
+   ! Add this to your mpi_domain_types module
+   module pure function get_periodic_dims(self) result(periodic_dims)
+      class(mpi_domain_t), intent(in) :: self
+      logical :: periodic_dims(3)
+      periodic_dims = self%periodic
+   end function get_periodic_dims
+
+   module function coords_to_rank(self, coords) result(rank)
+      class(mpi_domain_t), intent(in) :: self
+      integer, intent(in) :: coords(3)
+      integer :: rank
+      integer :: ierr
+
+      call MPI_Cart_rank(self%comm, coords, rank, ierr)
+      if (ierr /= MPI_SUCCESS) then
+         rank = MPI_PROC_NULL
+      end if
+   end function coords_to_rank
 
    !> Aborts the MPI processes cleanly
    module subroutine abort_mpi_processes(self, msg)
