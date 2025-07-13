@@ -46,6 +46,8 @@ module mpi_domain_types
       procedure, private :: determine_neighbors
       procedure, private :: set_periodicity
       procedure, private :: check_physical_boundaries
+      procedure :: log_message => domain_log_message
+
    end type mpi_domain_t
 
    interface
@@ -200,9 +202,6 @@ contains
       integer :: ierr
 
       call MPI_Cart_rank(self%comm, coords, rank, ierr)
-      if (ierr /= MPI_SUCCESS) then
-         rank = MPI_PROC_NULL
-      end if
    end function coords_to_rank
 
    !> Aborts the MPI processes cleanly
@@ -213,4 +212,14 @@ contains
       print *, msg
       call MPI_Abort(self%get_communicator(), ierr)
    end subroutine abort_mpi_processes
+
+   subroutine domain_log_message(self, msg)
+      class(mpi_domain_t), intent(in) :: self
+      character(len=*), intent(in) :: msg
+      character(len=256) :: formatted_msg
+
+      write (formatted_msg, '(A,I0,A,A)') "[Rank ", self%rank, "] ", trim(msg)
+      print *, trim(formatted_msg)
+   end subroutine domain_log_message
+
 end module mpi_domain_types
