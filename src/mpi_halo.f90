@@ -52,6 +52,9 @@ contains
       Y_FACE_SIZE = nx * nz
       Z_FACE_SIZE = nx * ny
 
+      buffer_rcv_x = 0.0_sp
+      buffer_rcv_y = 0.0_sp
+
       neighbors = domain%get_neighbors()
       comm_cart = domain%get_communicator()
 
@@ -111,6 +114,9 @@ contains
       X_FACE_SIZE = ny * nz
       Y_FACE_SIZE = nx * nz
       Z_FACE_SIZE = nx * ny
+
+      buffer_rcv_x = 0
+      buffer_rcv_y = 0
 
       neighbors = domain%get_neighbors()
       comm_cart = domain%get_communicator()
