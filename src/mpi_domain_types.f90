@@ -155,37 +155,37 @@ contains
    end subroutine check_physical_boundaries
 
    ! --- Implement simple getter functions ---
-   module function get_domain_communicator(self) result(comm)
+   pure module function get_domain_communicator(self) result(comm)
       class(mpi_domain_t), intent(in) :: self
       type(MPI_Comm) :: comm
       comm = self%comm
    end function get_domain_communicator
 
-   module function get_domain_rank(self) result(rank)
+   pure module function get_domain_rank(self) result(rank)
       class(mpi_domain_t), intent(in) :: self
       integer :: rank
       rank = self%rank
    end function get_domain_rank
 
-   module function get_domain_neighbors(self) result(neighbors_array)
+   pure module function get_domain_neighbors(self) result(neighbors_array)
       class(mpi_domain_t), intent(in) :: self
       integer :: neighbors_array(6)
       neighbors_array = self%neighbors
    end function get_domain_neighbors
 
-   module function get_domain_size(self) result(comm_size)
+   pure module function get_domain_size(self) result(comm_size)
       class(mpi_domain_t), intent(in) :: self
       integer :: comm_size
       comm_size = self%size
    end function get_domain_size
 
-   module function get_decomposition_coords(self) result(coordinates)
+   pure module function get_decomposition_coords(self) result(coordinates)
       class(mpi_domain_t), intent(in) :: self
       integer :: coordinates(3)
       coordinates = self%coords
    end function get_decomposition_coords
 
-   module function get_domain_dims(self) result(requested_dims)
+   pure module function get_domain_dims(self) result(requested_dims)
       class(mpi_domain_t), intent(in) :: self
       integer :: requested_dims(3)
       requested_dims = self%dims
