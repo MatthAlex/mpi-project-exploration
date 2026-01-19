@@ -9,8 +9,8 @@ program test_sendrecv_3D
    use mpi_domain_types, only: mpi_domain_t
    use lib_mpi_parameters, only: nx => num_cells_x, ny => num_cells_y, nz => num_cells_z, iterations, boundaries, core_decomposition
    use mpi_halo, only: update_mpi_halo
-   use test_halo, only: check_halo_real
-   use test_boundary, only: check_boundary_real
+   use test_halo, only: check_halo_real, check_halo_integer
+   use test_boundary, only: check_boundary_real, check_boundary_integer
    use boundary, only: update_boundaries
    implicit none(type, external)
 
@@ -18,6 +18,7 @@ program test_sendrecv_3D
    type(MPI_Comm) :: comm_cart
    integer :: ierr
    real(kind=sp), allocatable :: array(:, :, :), array_smol(:, :, :)
+   integer, allocatable :: array_i(:, :, :), array_smol_i(:, :, :)
    integer :: i
    integer :: rank
    real(dp) :: start, finish
@@ -33,11 +34,15 @@ program test_sendrecv_3D
 
    ! Create a local array with halo regions
    allocate (array(0:nx + 1, 0:ny + 1, 0:nz + 1), source=real(rank, kind=sp))
+   allocate (array_i(0:nx + 1, 0:ny + 1, 0:nz + 1), source=rank)
    ! Create a local array with halo regions of different size
    allocate (array_smol(0:nx / 4 + 1, 0:ny / 4 + 1, 0:nz / 4 + 1), source=real(rank, kind=sp))
+   allocate (array_smol_i(0:nx / 4 + 1, 0:ny / 4 + 1, 0:nz / 4 + 1), source=rank)
 
    start = MPI_WTime()
    do i = 1, iterations
+      if (rank == 0) print *, "Iteration:", i
+
       if (rank == 0) print *, "Array"
       call update_mpi_halo(domain=domain, array=array)
       call update_boundaries(domain=domain, array=array, bc_types=boundaries, dirichlet_values=dir_val)
@@ -45,13 +50,26 @@ program test_sendrecv_3D
       call check_halo_real(domain=domain, array=array)
       call check_boundary_real(domain=domain, array=array, bc_types=boundaries, dirichlet_values=dir_val)
 
-      call MPI_Barrier(comm=comm_cart, ierror=ierr)
       if (rank == 0) print *, "Array smol"
       call update_mpi_halo(domain=domain, array=array_smol)
       call update_boundaries(domain=domain, array=array_smol, bc_types=boundaries, dirichlet_values=dir_val)
 
       call check_halo_real(domain=domain, array=array_smol)
       call check_boundary_real(domain=domain, array=array_smol, bc_types=boundaries, dirichlet_values=dir_val)
+
+      if (rank == 0) print *, "Array Int"
+      call update_mpi_halo(domain=domain, array=array_i)
+      call update_boundaries(domain=domain, array=array_i, bc_types=boundaries, dirichlet_values=dir_val)
+
+      call check_halo_integer(domain=domain, array=array_i)
+      call check_boundary_integer(domain=domain, array=array_i, bc_types=boundaries, dirichlet_values=dir_val)
+
+      if (rank == 0) print *, "Array smol Int"
+      call update_mpi_halo(domain=domain, array=array_smol_i)
+      call update_boundaries(domain=domain, array=array_smol_i, bc_types=boundaries, dirichlet_values=dir_val)
+
+      call check_halo_integer(domain=domain, array=array_smol_i)
+      call check_boundary_integer(domain=domain, array=array_smol_i, bc_types=boundaries, dirichlet_values=dir_val)
 
       call MPI_Barrier(comm=comm_cart, ierror=ierr)
    end do

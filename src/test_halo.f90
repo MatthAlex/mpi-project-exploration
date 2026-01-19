@@ -5,7 +5,7 @@ module test_halo
    use lib_mpi_enums, only: D_WEST, D_EAST, D_SOUTH, D_NORTH, D_LOW, D_HIGH
    implicit none(type, external)
    private
-   public :: check_halo_real
+   public :: check_halo_real, check_halo_integer
 contains
 
    !! Check that all* values of each halo face are equal to the Neighbouring Rank for REAL array
@@ -54,4 +54,48 @@ contains
          end select
       end do
    end subroutine check_halo_real
+
+   subroutine check_halo_integer(domain, array)
+      class(mpi_domain_t), intent(in) :: domain
+      integer, dimension(:, :, :), intent(in) :: array
+      integer :: neighbors(6)
+      logical :: is_bc_face(6)
+      integer :: face
+
+      neighbors = domain%get_neighbors()
+      is_bc_face = domain%is_boundary_face(:)
+
+      do face = 1, 6
+         if (is_bc_face(face)) cycle
+
+         select case (face)
+         case (D_WEST)
+            if (any(array(1, 2:size(array, 2) - 1, 2:size(array, 3) - 1) /= neighbors(D_WEST))) then
+               call domain%abort("TEST HALO INT: Not OK in west")
+            end if
+         case (D_EAST)
+            if (any(array(size(array, 1), 2:size(array, 2) - 1, 2:size(array, 3) - 1) /= neighbors(D_EAST))) then
+               call domain%abort("TEST HALO INT: Not OK in east")
+            end if
+         case (D_SOUTH)
+            if (any(array(2:size(array, 1) - 1, 1, 2:size(array, 3) - 1) /= neighbors(D_SOUTH))) then
+               call domain%abort("TEST HALO INT: Not OK in south")
+            end if
+         case (D_NORTH)
+            if (any(array(2:size(array, 1) - 1, size(array, 2), 2:size(array, 3) - 1) /= neighbors(D_NORTH))) then
+               call domain%abort("TEST HALO INT: Not OK in north")
+            end if
+         case (D_LOW)
+            if (any(array(2:size(array, 1) - 1, 2:size(array, 2) - 1, 1) /= neighbors(D_LOW))) then
+               call domain%abort("TEST HALO INT: Not OK in low")
+            end if
+         case (D_HIGH)
+            if (any(array(2:size(array, 1) - 1, 2:size(array, 2) - 1, size(array, 3)) /= neighbors(D_HIGH))) then
+               call domain%abort("TEST HALO INT: Not OK in high")
+            end if
+         case default
+            call domain%abort("TEST HALO INT: Wrong direction index")
+         end select
+      end do
+   end subroutine check_halo_integer
 end module test_halo
