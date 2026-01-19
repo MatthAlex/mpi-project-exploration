@@ -63,14 +63,14 @@ contains
       call MPI_Sendrecv(buffer_send_x(1, 1), X_FACE_SIZE, MPI_REAL, neighbors(D_EAST), TAG_X, &
                         buffer_rcv_x(1, 1), X_FACE_SIZE, MPI_REAL, neighbors(D_WEST), TAG_X, &
                         comm_cart, status, ierr)
-      array(lbound(array, 1), :, :) = buffer_rcv_x
+      array(1, :, :) = buffer_rcv_x
 
       ! Exchange Y direction; I send North halo to North neighbour, I receive South halo from South Neighbour
       buffer_send_y(:, :) = array(:, ny - 1, :)
       call MPI_Sendrecv(buffer_send_y(1, 1), Y_FACE_SIZE, MPI_REAL, neighbors(D_NORTH), TAG_Y, &
                         buffer_rcv_y(1, 1), Y_FACE_SIZE, MPI_REAL, neighbors(D_SOUTH), TAG_Y, &
                         comm_cart, status, ierr)
-      array(:, lbound(array, 2), :) = buffer_rcv_y
+      array(:, 1, :) = buffer_rcv_y
 
       ! Exchange Z direction; I send High halo to High neighbour, I receive Low halo from Low Neighbour
       call MPI_Sendrecv(array(1, 1, nz - 1), Z_FACE_SIZE, MPI_REAL, neighbors(D_HIGH), TAG_Z, &
@@ -155,8 +155,8 @@ contains
       array(:, ny, :) = buffer_rcv_y
 
       ! Exchange Z direction; I send Low halo to Low neighbour, I receive High halo from High Neighbour
-      call MPI_Sendrecv(array(1, 1, 1), Z_FACE_SIZE, MPI_INTEGER, neighbors(D_LOW), TAG_Z, &
-                        array(1, 1, nz - 1), Z_FACE_SIZE, MPI_INTEGER, neighbors(D_HIGH), TAG_Z, &
+      call MPI_Sendrecv(array(1, 1, 2), Z_FACE_SIZE, MPI_INTEGER, neighbors(D_LOW), TAG_Z, &
+                        array(1, 1, nz), Z_FACE_SIZE, MPI_INTEGER, neighbors(D_HIGH), TAG_Z, &
                         comm_cart, status, ierr)
 
    end subroutine update_mpi_halo_integer
