@@ -85,6 +85,9 @@ contains
       call MPI_Dims_create(nnodes=parent_size, ndims=self%ndims, dims=self%dims, ierror=ierr)
       if (ierr /= MPI_SUCCESS) call self%abort("Error creating dimensions")
 
+      ! Validate BC consistency - periodic must be symmetric per axis
+      call validate_boundary_conditions(boundary_conditions)
+
       ! 3. Determine periodicity from inputs
       call self%set_periodicity(boundary_conditions)
 
@@ -222,4 +225,24 @@ contains
       print *, trim(formatted_msg)
    end subroutine domain_log_message
 
+   subroutine validate_boundary_conditions(bc_types)
+      use lib_mpi_enums, only: D_WEST, D_EAST, D_SOUTH, D_NORTH, D_LOW, D_HIGH, PERIODIC
+      integer, intent(in) :: bc_types(6)
+
+      ! X-axis
+      if ((bc_types(D_WEST) == PERIODIC) .neqv. (bc_types(D_EAST) == PERIODIC)) then
+         error stop "Invalid BC: X-axis periodic must be set on both West and East, or neither"
+      end if
+
+      ! Y-axis
+      if ((bc_types(D_SOUTH) == PERIODIC) .neqv. (bc_types(D_NORTH) == PERIODIC)) then
+         error stop "Invalid BC: Y-axis periodic must be set on both South and North, or neither"
+      end if
+
+      ! Z-axis
+      if ((bc_types(D_LOW) == PERIODIC) .neqv. (bc_types(D_HIGH) == PERIODIC)) then
+         error stop "Invalid BC: Z-axis periodic must be set on both Low and High, or neither"
+      end if
+
+   end subroutine validate_boundary_conditions
 end module mpi_domain_types
