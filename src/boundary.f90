@@ -31,8 +31,15 @@ module boundary
    end interface apply_neumann_bc
 
 contains
-   !> Applies boundary conditions to each boundary face of the local domain,
-   !> only when the face belongs to the physical boundary.
+   !> Applies boundary conditions to physical boundary faces only.
+   !>
+   !> Cell layout (1-indexed in callee due to assumed-shape remapping):
+   !>   Index:    1     2    3   ...  n-1   n
+   !>   Cell:   ghost | interior cells    | ghost
+   !>
+   !> Face ownership (mutually exclusive):
+   !>   - neighbor /= `MPI_PROC_NULL`  →  halo exchange owns the ghost cell
+   !>   - neighbor == `MPI_PROC_NULL`  →  boundary condition owns the ghost cell
    subroutine update_boundary_conditions_real(domain, array, bc_types)
       use lib_mpi_parameters, only: dirichlet_value
       class(mpi_domain_t), intent(in) :: domain
@@ -66,8 +73,15 @@ contains
 
    end subroutine update_boundary_conditions_real
 
-      !> Applies boundary conditions to each boundary face of the local domain,
-   !> only when the face belongs to the physical boundary.
+   !> Applies boundary conditions to physical boundary faces only.
+   !>
+   !> Cell layout (1-indexed in callee due to assumed-shape remapping):
+   !>   Index:    1     2    3   ...  n-1   n
+   !>   Cell:   ghost | interior cells    | ghost
+   !>
+   !> Face ownership (mutually exclusive):
+   !>   - neighbor /= `MPI_PROC_NULL`  →  halo exchange owns the ghost cell
+   !>   - neighbor == `MPI_PROC_NULL`  →  boundary condition owns the ghost cell
    subroutine update_boundary_conditions_int(domain, array, bc_types)
       use lib_mpi_parameters, only: dirichlet_value
       class(mpi_domain_t), intent(in) :: domain
