@@ -40,8 +40,7 @@ contains
    !> Face ownership (mutually exclusive):
    !>   - neighbor /= `MPI_PROC_NULL`  →  halo exchange owns the ghost cell
    !>   - neighbor == `MPI_PROC_NULL`  →  boundary condition owns the ghost cell
-   subroutine update_boundary_conditions_real(domain, array, bc_types)
-      use lib_mpi_parameters, only: dirichlet_value
+   subroutine update_boundary_conditions_real(domain, array, bc_types, dirichlet_values)
       class(mpi_domain_t), intent(in) :: domain
       real(kind=sp), contiguous, intent(in out) :: array(:, :, :)
          !! Source array to update boundary conditions
@@ -49,6 +48,7 @@ contains
          !! The boundary conditions for each face/direction
       integer :: face
          !! Local loop variable - West, East, South, North, Low, High
+      real(kind=sp), intent(in) :: dirichlet_values(6)
 
       ! Check if rank is internal to domain - no boundaries
       if (domain%is_interior) return
@@ -63,7 +63,7 @@ contains
             ! This case technically shouldn't be reached if is_boundary_face is true.
             cycle
          case (DIRICHLET)
-            call apply_dirichlet_bc(domain, array, face, constant_value=dirichlet_value)
+            call apply_dirichlet_bc(domain, array, face, constant_value=dirichlet_values(face))
          case (NEUMANN)
             call apply_neumann_bc(domain, array, face)
          case default
@@ -82,13 +82,13 @@ contains
    !> Face ownership (mutually exclusive):
    !>   - neighbor /= `MPI_PROC_NULL`  →  halo exchange owns the ghost cell
    !>   - neighbor == `MPI_PROC_NULL`  →  boundary condition owns the ghost cell
-   subroutine update_boundary_conditions_int(domain, array, bc_types)
-      use lib_mpi_parameters, only: dirichlet_value
+   subroutine update_boundary_conditions_int(domain, array, bc_types, dirichlet_values)
       class(mpi_domain_t), intent(in) :: domain
       integer, contiguous, intent(in out) :: array(:, :, :)
          !! Source array to update boundary conditions
       integer, intent(in) :: bc_types(6)
          !! The boundary conditions for each face/direction
+      real(kind=sp), intent(in) :: dirichlet_values(6)
       integer :: face
          !! Local loop variable - West, East, South, North, Low, High
 
@@ -105,7 +105,7 @@ contains
             ! This case technically shouldn't be reached if is_boundary_face is true.
             cycle
          case (DIRICHLET)
-            call apply_dirichlet_bc(domain, array, face, constant_value=int(dirichlet_value))
+            call apply_dirichlet_bc(domain, array, face, constant_value=int(dirichlet_values(face)))
          case (NEUMANN)
             call apply_neumann_bc(domain, array, face)
          case default
@@ -121,7 +121,7 @@ contains
       real(kind=sp), contiguous, intent(in out) :: array(:, :, :)
       integer, intent(in) :: face
       real(kind=sp), intent(in) :: constant_value
-         !! Dirichlet constant value. Static across all faces
+         !! Per-face Dirichlet values
       integer :: rank
 
       rank = domain%get_rank()
@@ -155,7 +155,7 @@ contains
       integer, contiguous, intent(in out) :: array(:, :, :)
       integer, intent(in) :: face
       integer, intent(in) :: constant_value
-         !! Dirichlet constant value. Static across all faces
+         !! Per-face Dirichlet values
       integer :: rank
 
       rank = domain%get_rank()

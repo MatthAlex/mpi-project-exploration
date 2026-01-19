@@ -21,11 +21,15 @@ program test_sendrecv_3D
    integer :: i
    integer :: rank
    real(dp) :: start, finish
+   real(sp) :: dir_val(6)
+   !! Dirichlet values
 
    call MPI_Init(ierror=ierr)
    call domain%initialize(core_decomposition, boundaries)
    rank = domain%get_rank()
    comm_cart = domain%get_communicator()
+
+   dir_val = [1.0_sp, 2.0_sp, 3.0_sp, 4.0_sp, 5.0_sp, 6.0_sp]
 
    ! Create a local array with halo regions
    allocate (array(0:nx + 1, 0:ny + 1, 0:nz + 1), source=real(rank, kind=sp))
@@ -36,18 +40,18 @@ program test_sendrecv_3D
    do i = 1, iterations
       if (rank == 0) print *, "Array"
       call update_mpi_halo(domain=domain, array=array)
-      call update_boundaries(domain=domain, array=array, bc_types=boundaries)
+      call update_boundaries(domain=domain, array=array, bc_types=boundaries, dirichlet_values=dir_val)
 
       call check_halo_real(domain=domain, array=array)
-      call check_boundary_real(domain=domain, array=array)
+      call check_boundary_real(domain=domain, array=array, bc_types=boundaries, dirichlet_values=dir_val)
 
       call MPI_Barrier(comm=comm_cart, ierror=ierr)
       if (rank == 0) print *, "Array smol"
       call update_mpi_halo(domain=domain, array=array_smol)
-      call update_boundaries(domain=domain, array=array_smol, bc_types=boundaries)
+      call update_boundaries(domain=domain, array=array_smol, bc_types=boundaries, dirichlet_values=dir_val)
 
       call check_halo_real(domain=domain, array=array_smol)
-      call check_boundary_real(domain=domain, array=array_smol)
+      call check_boundary_real(domain=domain, array=array_smol, bc_types=boundaries, dirichlet_values=dir_val)
 
       call MPI_Barrier(comm=comm_cart, ierror=ierr)
    end do

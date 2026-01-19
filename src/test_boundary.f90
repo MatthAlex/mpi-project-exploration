@@ -1,7 +1,6 @@
 !> Helper module that defines how to assert validity for a boundary update
 module test_boundary
    use mpi_domain_types, only: mpi_domain_t
-   use lib_mpi_parameters, only: nx => num_cells_x, ny => num_cells_y, nz => num_cells_z, boundaries
    use lib_mpi_precision, only: sp
    use lib_mpi_enums, only: D_WEST, D_EAST, D_SOUTH, D_NORTH, D_LOW, D_HIGH, PERIODIC, DIRICHLET, NEUMANN
    implicit none(type, external)
@@ -14,10 +13,12 @@ contains
    !> - Periodic (0): Handled by test_halo
    !> - Dirichlet (1): Should be constant value 1.0
    !> - Neumann (2): Should match adjacent interior cell
-   subroutine check_boundary_real(domain, array)
-      use lib_mpi_parameters, only: dirichlet_value
+   subroutine check_boundary_real(domain, array, bc_types, dirichlet_values)
       class(mpi_domain_t), intent(in) :: domain
       real(kind=sp), dimension(:, :, :), intent(in) :: array
+      !! Assumed-shape array extends from 1:n. `nx(|y|z)` *includes* halos
+      integer, intent(in) :: bc_types(6)
+      real(kind=sp), intent(in) :: dirichlet_values(6)
       real(kind=sp), parameter :: tolerance = 1.0e-10_sp
       logical :: is_bc_face(6)
 
@@ -25,9 +26,9 @@ contains
 
       ! West face
       if (is_bc_face(D_WEST)) then
-         select case (boundaries(D_WEST))
+         select case (bc_types(D_WEST))
          case (DIRICHLET)
-            if (any(abs(array(1, 2:size(array, 2) - 1, 2:size(array, 3) - 1) - dirichlet_value) > tolerance)) then
+            if (any(abs(array(1, 2:size(array, 2) - 1, 2:size(array, 3) - 1) - dirichlet_values(D_WEST)) > tolerance)) then
                call domain%abort("TEST Boundary: Not OK: West face Dirichlet")
             end if
          case (NEUMANN)
@@ -42,9 +43,10 @@ contains
 
       ! East face
       if (is_bc_face(D_EAST)) then
-         select case (boundaries(D_EAST))
+         select case (bc_types(D_EAST))
          case (DIRICHLET)
-            if (any(abs(array(ubound(array, 1), 2:size(array, 2) - 1, 2:size(array, 3) - 1) - dirichlet_value) > tolerance)) then
+            if (any(abs(array(ubound(array, 1), 2:size(array, 2) - 1, 2:size(array, 3) - 1) - &
+               dirichlet_values(D_EAST)) > tolerance)) then
                call domain%abort("TEST Boundary: Not OK: East face Dirichlet")
             end if
          case (NEUMANN)
@@ -59,9 +61,9 @@ contains
 
       ! South face
       if (is_bc_face(D_SOUTH)) then
-         select case (boundaries(D_SOUTH))
+         select case (bc_types(D_SOUTH))
          case (DIRICHLET)
-            if (any(abs(array(2:size(array, 1) - 1, 1, 2:size(array, 3) - 1) - dirichlet_value) > tolerance)) then
+            if (any(abs(array(2:size(array, 1) - 1, 1, 2:size(array, 3) - 1) - dirichlet_values(D_SOUTH)) > tolerance)) then
                call domain%abort("TEST Boundary: Not OK: South face Dirichlet")
             end if
          case (NEUMANN)
@@ -76,9 +78,10 @@ contains
 
       ! North face
       if (is_bc_face(D_NORTH)) then
-         select case (boundaries(D_NORTH))
+         select case (bc_types(D_NORTH))
          case (DIRICHLET)
-            if (any(abs(array(2:size(array, 1) - 1, ubound(array, 2), 2:size(array, 3) - 1) - dirichlet_value) > tolerance)) then
+            if (any(abs(array(2:size(array, 1) - 1, ubound(array, 2), 2:size(array, 3) - 1) - &
+               dirichlet_values(D_NORTH)) > tolerance)) then
                call domain%abort("TEST Boundary: Not OK: North face Dirichlet")
             end if
          case (NEUMANN)
@@ -93,9 +96,9 @@ contains
 
       ! Low face
       if (is_bc_face(D_LOW)) then
-         select case (boundaries(D_LOW))
+         select case (bc_types(D_LOW))
          case (DIRICHLET)
-            if (any(abs(array(2:size(array, 1) - 1, 2:size(array, 2) - 1, 1) - dirichlet_value) > tolerance)) then
+            if (any(abs(array(2:size(array, 1) - 1, 2:size(array, 2) - 1, 1) - dirichlet_values(D_LOW)) > tolerance)) then
                call domain%abort("TEST Boundary: Not OK: Low face Dirichlet")
             end if
          case (NEUMANN)
@@ -110,9 +113,10 @@ contains
 
       ! High face
       if (is_bc_face(D_HIGH)) then
-         select case (boundaries(D_HIGH))
+         select case (bc_types(D_HIGH))
          case (DIRICHLET)
-            if (any(abs(array(2:size(array, 1) - 1, 2:size(array, 2) - 1, ubound(array, 3)) - dirichlet_value) > tolerance)) then
+            if (any(abs(array(2:size(array, 1) - 1, 2:size(array, 2) - 1, ubound(array, 3)) - &
+               dirichlet_values(D_HIGH)) > tolerance)) then
                call domain%abort("TEST Boundary: Not OK: High face Dirichlet")
             end if
          case (NEUMANN)
