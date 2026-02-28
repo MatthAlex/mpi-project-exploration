@@ -11,7 +11,7 @@ module boundary
    private
    public :: update_boundaries
 
-   logical, parameter :: DEBUG = .true.
+   logical, parameter :: DEBUG = .false.
       !! Print verbose debug statements
 
    !! Generic interfaces that wrap the real(sp) and integer routines

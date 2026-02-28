@@ -1,4 +1,4 @@
-# Fortran MPI exploration
+# Fortran MPI Cartesian Library
 
 Exploring a simple MPI cartesian grid with halo region updates, `mpi_f08`, `havaita`, some clever encapsulation, and general project structure and architecture.
 
@@ -120,7 +120,7 @@ Contributions from the community are welcome. To contribute, consider opening an
 
 ## Contact
 
-For questions or suggestions, please contact me at [email](matt.alexandrakis@gmail.com) or open an issue.
+For questions or suggestions, please contact me at [email](matthaios.alexandrakis@gre.ac.uk) or open an issue.
 
 ## License
 
@@ -128,41 +128,12 @@ The project is operating under an [MIT](./LICENSE) license. You are free to use,
 
 ## Appendix
 
-### Project Directory Structure
-
-```sh
-$ tree -Ia '__pycache__|.git|.pytest_cache|.venv|build|.gen*|ford'
-.
-├── app  # The main program driver(s) resides here
-│   └── main.f90
-├── docs
-│   ├── MIGRATION.md
-│   └── TOOLING.md
-├── ford.md  # FORD config file
-├── .fortls  # VSCode Modern Fortran config file
-├── fpm.toml  # Fortran Package Manager config file
-├── .fprettify.rc  # fprettify config file
-├── .gitignore  # Git ignore list of files and directories
-├── LICENSE
-├── .pre-commit-config.yaml  # pre-commit config file
-├── pyproject.toml  # config file
-├── README.md  # you are here!
-├── src  # All source code files are placed in here, except main driver
-│   └── first_steps.f90
-├── test  # All tests are placed in here
-│   └── check.f90
-└── .vscode  # Holds VSCode configs and runtime/debugging tasks
-    ├── extensions.json  # simply populates the "Recommended" Extensions tab
-    └── settings.json  # also referred to as "Workspace Settings (JSON)"
-```
-
 ### References and Links
 
 - [template](https://github.com/MatthAlex/fortran-project-template)
 - [`fpm`](https://github.com/fortran-lang/fpm)
 - [Modern Fortran extension](https://github.com/fortran-lang/vscode-fortran-support)
 - [`fortls`](https://github.com/fortran-lang/fortls)
-- [`fprettify`](https://github.com/pseewald/fprettify)
 - [`pre-commit`](https://pre-commit.com/)
 - [`ford`](https://github.com/Fortran-FOSS-Programmers/ford)
 - [`uv`](https://github.com/astral-sh/uv)

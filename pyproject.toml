@@ -1,29 +1,27 @@
 [project]
-name = "mpi-project-exploration"
-version = "2024.0.1"
-description = "A simple Fortran MPI project to explore ideas."
+name = "mpi-cartesian-library"
+version = "v0.1.0"
+description = "A Modern Fortran MPI cartesian library for stencil operations."
 dependencies = [
     "fpm",
     "ford",
     "graphviz",
 ]
-requires-python = ">=3.8"
+requires-python = ">=3.10"
 authors = [
-  { name = "Your name", email = "your@email.com" },
+  { name = "Matt Alexandrakis", email = "matthaios.alexandrakis@gre.ac.uk" },
 ]
 readme = "README.md"
 license = { file = "LICENSE" }
 keywords = ["fortran", "modern fortran", "mpi", "vscode"]
 classifiers = [
   "Development Status :: 4 - Beta",
-  "Programming Language :: Python",
   "Programming Language :: Fortran",
 ]
 
 [project.optional-dependencies]
 dev = [
     "fortls",
-    "fprettify",
     "pre-commit",
     "fortitude-lint",
 ]
