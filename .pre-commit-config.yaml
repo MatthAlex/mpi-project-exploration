@@ -13,16 +13,6 @@ repos:
   - id: check-added-large-files
   - id: check-merge-conflict
 
-- repo: https://github.com/fortran-lang/fprettify
-  rev: v0.3.7
-  hooks:
-  - id: fprettify
-    name: auto-formatter for modern fortran source code
-    description: imposes strict whitespace formatting for modern (F90+) Fortran code
-    entry: fprettify -c .fprettify.rc
-    language: python
-    files: \.[fF]\d*$
-
 - repo: local
   hooks:
   - id: compile-fpm

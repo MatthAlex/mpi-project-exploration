@@ -1,10 +1,4 @@
 {
-    // General settings - can only be used in User "settings.json"
-    // "telemetry.telemetryLevel": "off",
-    // "python.diagnostics.sourceMapsEnabled": true,
-    // "python.venvFolders": [
-    //     "env", "venv", ".env", ".venv"
-    // ],
     // General settings - can migrate to User "settings.json"
     "editor.renderWhitespace": "all",
     "editor.wordWrap": "on",
@@ -45,49 +39,15 @@
         "**/*.o": true,
         "**/*.obj": true,
     },
-    // Python
-    "python.analysis.completeFunctionParens": true,
-    "python.analysis.inlayHints.functionReturnTypes": true,
-    "python.analysis.inlayHints.variableTypes": true,
-    "python.analysis.typeCheckingMode": "basic",
-    "python.analysis.inlayHints.pytestParameters": true,
-    "python.analysis.userFileIndexingLimit": 40,
-    "python.analysis.exclude": [
-        "**/__pycache__",
-        "**/node_modules",
-        "**/.git",
-        "**/.*_cache",
-        "**/.vscode",
-        "**/*env",
-        "**/*venv"
-    ],
-    "python.createEnvironment.trigger": "prompt",
-    "python.languageServer": "Pylance",
-    "python.terminal.activateEnvInCurrentTerminal": true,
-    "python.testing.pytestEnabled": true,
-    "python.testing.cwd": "${workspaceFolder}/tests",
-    "python.testing.unittestEnabled": true,
-    //pylint
-    "pylint.importStrategy": "fromEnvironment",
-    // mypy
-    "mypy-type-checker.importStrategy": "fromEnvironment",
-    // flake8
-    "flake8.importStrategy": "fromEnvironment",
     "fortran.fortls.notifyInit": true,
-    "fortran.fortls.configure": ".fortls",
     "fortran.fortls.maxCommentLineLength": 132,
     "fortran.fortls.maxLineLength": 132,
     "fortran.fortls.sortKeywords": true,
     "fortran.fortls.incrementalSync": true,
-    "fortran.formatting.formatter": "Disabled",
-    "fortran.formatting.fprettifyArgs": [
-        "--whitespace-comma 1",
-        "--enable-decl",
-        "-i 3",
-    ],
     "fortran.provide.symbols": "fortls",
-    "fortran.linter.modOutput": "${workspaceFolder}/.generated_modules",
     "fortran.linter.compiler": "gfortran",
+    "fortran.linter.compilerPath": "mpif90",
+    "fortran.linter.initialize": true,
     "fortran.linter.extraArgs": [
         "-Wall",
         "-Wextra",
@@ -105,9 +65,4 @@
         "-Wimplicit-procedure",
         "-Wcharacter-truncation",
     ],
-    "fortran.linter.includePaths": [
-        "${workspaceFolder}/.generated_modules"
-    ],
-    "fortran.linter.compilerPath": "/usr/bin/mpif90",
-    "fortran.linter.initialize": true,
 }
