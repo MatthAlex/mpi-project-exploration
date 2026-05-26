@@ -49,7 +49,7 @@ contains
       ! Check if rank is internal to domain - no boundaries
       if (domain%is_interior) return
 
-      do face = 1, 6
+      do face = D_WEST, D_HIGH
          ! Check if face is on the boundary
          if (.not. domain%is_boundary_face(face)) cycle
 
@@ -89,7 +89,7 @@ contains
       ! Check if rank is internal to domain - no boundaries
       if (domain%is_interior) return
 
-      do face = 1, 6
+      do face = D_WEST, D_HIGH
          ! Check if face is on the boundary
          if (.not. domain%is_boundary_face(face)) cycle
 
