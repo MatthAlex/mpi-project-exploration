@@ -7,7 +7,7 @@ program test_sendrecv_3D
    use mpi_f08, only: MPI_Init, MPI_Barrier, MPI_Finalize, MPI_WTime, MPI_Comm
    use lib_mpi_precision, only: sp, dp
    use mpi_domain_types, only: mpi_domain_t
-   use lib_mpi_parameters, only: nx => num_cells_x, ny => num_cells_y, nz => num_cells_z, iterations, boundaries, core_decomposition
+   use lib_mpi_enums, only: PERIODIC, DIRICHLET, NEUMANN
    use mpi_halo, only: update_mpi_halo
    use test_halo, only: check_halo_real, check_halo_integer
    use test_boundary, only: check_boundary_real, check_boundary_integer
@@ -19,11 +19,20 @@ program test_sendrecv_3D
    integer :: ierr
    real(kind=sp), allocatable :: array(:, :, :), array_smol(:, :, :)
    integer, allocatable :: array_i(:, :, :), array_smol_i(:, :, :)
-   integer :: i
-   integer :: rank
+   integer :: i, nx, ny, nz, iterations
+   integer :: rank, boundaries(6), core_decomposition(3)
    real(dp) :: start, finish
    real(sp) :: dir_val(6)
    !! Dirichlet values
+
+   nx = 16
+   ny = 17
+   nz = 18
+
+   iterations = 2
+
+   boundaries = [PERIODIC, PERIODIC, DIRICHLET, NEUMANN, NEUMANN, NEUMANN]
+   core_decomposition = 0
 
    call MPI_Init(ierror=ierr)
    call domain%initialize(core_decomposition, boundaries)

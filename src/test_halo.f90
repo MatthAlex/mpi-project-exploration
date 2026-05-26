@@ -1,6 +1,5 @@
 module test_halo
    use mpi_domain_types, only: mpi_domain_t
-   use lib_mpi_parameters, only: nx => num_cells_x, ny => num_cells_y, nz => num_cells_z
    use lib_mpi_precision, only: sp
    use lib_mpi_enums, only: D_WEST, D_EAST, D_SOUTH, D_NORTH, D_LOW, D_HIGH
    implicit none(type, external)
