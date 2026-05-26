@@ -10,9 +10,6 @@ module boundary
    private
    public :: update_boundaries
 
-   logical, parameter :: DEBUG = .false.
-      !! Print verbose debug statements
-
    !! Generic interfaces that wrap the real(sp) and integer routines
    interface update_boundaries
       module procedure update_boundary_conditions_real
@@ -39,7 +36,7 @@ contains
    !> Face ownership (mutually exclusive):
    !>   - neighbor /= `MPI_PROC_NULL`  →  halo exchange owns the ghost cell
    !>   - neighbor == `MPI_PROC_NULL`  →  boundary condition owns the ghost cell
-   subroutine update_boundary_conditions_real(domain, array, bc_types, dirichlet_values)
+   pure subroutine update_boundary_conditions_real(domain, array, bc_types, dirichlet_values)
       class(mpi_domain_t), intent(in) :: domain
       real(kind=sp), contiguous, intent(in out) :: array(:, :, :)
          !! Source array to update boundary conditions
@@ -65,8 +62,6 @@ contains
             call apply_dirichlet_bc(domain, array, face, constant_value=dirichlet_values(face))
          case (NEUMANN)
             call apply_neumann_bc(domain, array, face)
-         case default
-            call domain%abort("BC Not implemented yet. Exiting..")
          end select
       end do
 
@@ -81,7 +76,7 @@ contains
    !> Face ownership (mutually exclusive):
    !>   - neighbor /= `MPI_PROC_NULL`  →  halo exchange owns the ghost cell
    !>   - neighbor == `MPI_PROC_NULL`  →  boundary condition owns the ghost cell
-   subroutine update_boundary_conditions_int(domain, array, bc_types, dirichlet_values)
+   pure subroutine update_boundary_conditions_int(domain, array, bc_types, dirichlet_values)
       class(mpi_domain_t), intent(in) :: domain
       integer, contiguous, intent(in out) :: array(:, :, :)
          !! Source array to update boundary conditions
@@ -107,83 +102,61 @@ contains
             call apply_dirichlet_bc(domain, array, face, constant_value=int(dirichlet_values(face)))
          case (NEUMANN)
             call apply_neumann_bc(domain, array, face)
-         case default
-            call domain%abort("BC Not implemented yet. Exiting..")
          end select
       end do
 
    end subroutine update_boundary_conditions_int
 
    !> Applies a Dirichlet boundary condition by setting boundary cells to a constant.
-   subroutine apply_dirichlet_bc_real(domain, array, face, constant_value)
+   pure subroutine apply_dirichlet_bc_real(domain, array, face, constant_value)
       class(mpi_domain_t), intent(in) :: domain
       real(kind=sp), contiguous, intent(in out) :: array(:, :, :)
       integer, intent(in) :: face
       real(kind=sp), intent(in) :: constant_value
          !! Per-face Dirichlet values
-      integer :: rank
 
-      rank = domain%get_rank()
       select case (face)
       case (D_WEST)
-         if (DEBUG) write (*, "(2(A,1X,I0))") "BC DIRICHLET: Updating face", D_WEST, " for rank:", rank
          array(1, :, :) = constant_value
       case (D_EAST)
-         if (DEBUG) write (*, "(2(A,1X,I0))") "BC DIRICHLET: Updating face", D_EAST, " for rank:", rank
          array(ubound(array, 1), :, :) = constant_value
       case (D_SOUTH)
-         if (DEBUG) write (*, "(2(A,1X,I0))") "BC DIRICHLET: Updating face", D_SOUTH, " for rank:", rank
          array(:, 1, :) = constant_value
       case (D_NORTH)
-         if (DEBUG) write (*, "(2(A,1X,I0))") "BC DIRICHLET: Updating face", D_NORTH, " for rank:", rank
          array(:, ubound(array, 2), :) = constant_value
       case (D_LOW)
-         if (DEBUG) write (*, "(2(A,1X,I0))") "BC DIRICHLET: Updating face", D_LOW, " for rank:", rank
          array(:, :, 1) = constant_value
       case (D_HIGH)
-         if (DEBUG) write (*, "(2(A,1X,I0))") "BC DIRICHLET: Updating face", D_HIGH, " for rank:", rank
          array(:, :, ubound(array, 3)) = constant_value
-      case default
-         call domain%abort("Dirichlet boundary condition direction index not standard... Exiting..")
       end select
    end subroutine apply_dirichlet_bc_real
 
       !> Applies a Dirichlet boundary condition by setting boundary cells to a constant.
-   subroutine apply_dirichlet_bc_int(domain, array, face, constant_value)
+   pure subroutine apply_dirichlet_bc_int(domain, array, face, constant_value)
       class(mpi_domain_t), intent(in) :: domain
       integer, contiguous, intent(in out) :: array(:, :, :)
       integer, intent(in) :: face
       integer, intent(in) :: constant_value
          !! Per-face Dirichlet values
-      integer :: rank
 
-      rank = domain%get_rank()
       select case (face)
       case (D_WEST)
-         if (DEBUG) write (*, "(2(A,1X,I0))") "BC DIRICHLET: Updating face", D_WEST, " for rank:", rank
          array(1, :, :) = constant_value
       case (D_EAST)
-         if (DEBUG) write (*, "(2(A,1X,I0))") "BC DIRICHLET: Updating face", D_EAST, " for rank:", rank
          array(ubound(array, 1), :, :) = constant_value
       case (D_SOUTH)
-         if (DEBUG) write (*, "(2(A,1X,I0))") "BC DIRICHLET: Updating face", D_SOUTH, " for rank:", rank
          array(:, 1, :) = constant_value
       case (D_NORTH)
-         if (DEBUG) write (*, "(2(A,1X,I0))") "BC DIRICHLET: Updating face", D_NORTH, " for rank:", rank
          array(:, ubound(array, 2), :) = constant_value
       case (D_LOW)
-         if (DEBUG) write (*, "(2(A,1X,I0))") "BC DIRICHLET: Updating face", D_LOW, " for rank:", rank
          array(:, :, 1) = constant_value
       case (D_HIGH)
-         if (DEBUG) write (*, "(2(A,1X,I0))") "BC DIRICHLET: Updating face", D_HIGH, " for rank:", rank
          array(:, :, ubound(array, 3)) = constant_value
-      case default
-         call domain%abort("Dirichlet boundary condition direction index not standard... Exiting..")
       end select
    end subroutine apply_dirichlet_bc_int
 
    !> Applies a Neumann boundary by copying data from the adjacent interior cell.
-   subroutine apply_neumann_bc_real(domain, array, face)
+   pure subroutine apply_neumann_bc_real(domain, array, face)
       class(mpi_domain_t), intent(in) :: domain
       real(kind=sp), contiguous, intent(in out) :: array(:, :, :)
       integer, intent(in) :: face
@@ -195,13 +168,11 @@ contains
       case (D_NORTH); array(:, ubound(array, 2), :) = array(:, ubound(array, 2) - 1, :)
       case (D_LOW); array(:, :, 1) = array(:, :, 2)
       case (D_HIGH); array(:, :, ubound(array, 3)) = array(:, :, ubound(array, 3) - 1)
-      case default
-         call domain%abort("Neumann boundary condition direction index not standard... Exiting..")
       end select
    end subroutine apply_neumann_bc_real
 
-      !> Applies a Neumann boundary by copying data from the adjacent interior cell.
-   subroutine apply_neumann_bc_int(domain, array, face)
+   !> Applies a Neumann boundary by copying data from the adjacent interior cell.
+   pure subroutine apply_neumann_bc_int(domain, array, face)
       class(mpi_domain_t), intent(in) :: domain
       integer, contiguous, intent(in out) :: array(:, :, :)
       integer, intent(in) :: face
@@ -213,8 +184,6 @@ contains
       case (D_NORTH); array(:, ubound(array, 2), :) = array(:, ubound(array, 2) - 1, :)
       case (D_LOW); array(:, :, 1) = array(:, :, 2)
       case (D_HIGH); array(:, :, ubound(array, 3)) = array(:, :, ubound(array, 3) - 1)
-      case default
-         call domain%abort("Neumann boundary condition direction index not standard... Exiting..")
       end select
    end subroutine apply_neumann_bc_int
 
