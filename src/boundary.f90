@@ -2,9 +2,9 @@
 !> - Detects physical boundary faces per rank.
 !> - Supports periodic, Dirichlet, and Neumann conditions.
 module boundary
+   use lib_mpi_enums, only: D_WEST, D_EAST, D_SOUTH, D_NORTH, D_LOW, D_HIGH, PERIODIC, DIRICHLET, NEUMANN
    use lib_mpi_precision, only: sp
    use mpi_domain_types, only: mpi_domain_t
-   use lib_mpi_enums, only: D_WEST, D_EAST, D_SOUTH, D_NORTH, D_LOW, D_HIGH, PERIODIC, DIRICHLET, NEUMANN
    implicit none(type, external)
    private
    public :: update_boundaries

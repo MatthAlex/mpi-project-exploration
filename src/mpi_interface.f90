@@ -1,7 +1,7 @@
 module mpi_interface
    !! This module acts an an intermediate layer for legacy codes that can't readily integrate the OOP object.
-   use mpi_f08, only: MPI_Comm, MPI_Cart_rank, MPI_SUCCESS
    use mpi_domain_types, only: mpi_domain_t
+   use mpi_f08, only: MPI_Comm, MPI_Cart_rank, MPI_SUCCESS
    implicit none(type, external)
    private
    public :: create_mpi_domain, get_mpi_domain_handle

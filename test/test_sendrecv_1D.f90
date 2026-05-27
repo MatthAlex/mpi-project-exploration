@@ -1,8 +1,8 @@
 !> Simple 1D MPI implementation of a blocking halo update
 program test_sendrecv_1D
+   use lib_mpi_precision, only: sp
    use mpi, only: MPI_Init, MPI_Comm_rank, MPI_Comm_size, MPI_Sendrecv, MPI_Finalize
    use mpi, only: MPI_COMM_WORLD, MPI_STATUS_SIZE, MPI_REAL
-   use lib_mpi_precision, only: sp
    implicit none(type, external)
 
    integer :: ierr, rank, comsize

@@ -4,14 +4,14 @@
 !> - Heuristics may reorder the original comm (CPU topology) into a more efficient one
 !> - Figures out who the neighbours are of each rank automatically
 program test_sendrecv_3D
-   use mpi_f08, only: MPI_Init, MPI_Barrier, MPI_Finalize, MPI_WTime, MPI_Comm
+   use boundary, only: update_boundaries
+   use lib_mpi_enums, only: PERIODIC, DIRICHLET, NEUMANN
    use lib_mpi_precision, only: sp, dp
    use mpi_domain_types, only: mpi_domain_t
-   use lib_mpi_enums, only: PERIODIC, DIRICHLET, NEUMANN
+   use mpi_f08, only: MPI_Init, MPI_Barrier, MPI_Finalize, MPI_WTime, MPI_Comm
    use mpi_halo, only: update_mpi_halo
-   use test_halo, only: check_halo_real, check_halo_integer
    use test_boundary, only: check_boundary_real, check_boundary_integer
-   use boundary, only: update_boundaries
+   use test_halo, only: check_halo_real, check_halo_integer
    implicit none(type, external)
 
    type(mpi_domain_t) :: domain
