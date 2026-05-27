@@ -1,8 +1,8 @@
 !> Helper module that defines how to assert validity for a boundary update
 module test_boundary
-   use mpi_domain_types, only: mpi_domain_t
-   use lib_mpi_precision, only: sp
    use lib_mpi_enums, only: D_WEST, D_EAST, D_SOUTH, D_NORTH, D_LOW, D_HIGH, PERIODIC, DIRICHLET, NEUMANN
+   use lib_mpi_precision, only: sp
+   use mpi_domain_types, only: mpi_domain_t
    implicit none(type, external)
    private
    public :: check_boundary_real, check_boundary_integer
