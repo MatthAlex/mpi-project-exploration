@@ -5,7 +5,7 @@ module mpi_halo
    use lib_mpi_enums, only: D_WEST, D_EAST, D_SOUTH, D_NORTH, D_LOW, D_HIGH
    use lib_mpi_precision, only: sp
    use mpi_domain_types, only: mpi_domain_t
-   use mpi_f08, only: MPI_Sendrecv, MPI_STATUS, MPI_REAL, MPI_INTEGER, MPI_Comm, MPI_SUCCESS
+   use mpi_f08, only: MPI_Sendrecv, MPI_STATUS, MPI_REAL, MPI_INTEGER, MPI_Comm, MPI_SUCCESS, MPI_PROC_NULL
    implicit none(type, external)
    private
    public :: update_mpi_halo
@@ -59,20 +59,20 @@ contains
       comm_cart = domain%get_communicator()
 
       ! Exchange X direction; I send East halo to East neighbour, I receive West halo from West Neighbour
-      buffer_send_x(:, :) = array(nx - 1, :, :)
+      if (neighbors(D_EAST) /= MPI_PROC_NULL) buffer_send_x(:, :) = array(nx - 1, :, :)
       call MPI_Sendrecv(buffer_send_x(1, 1), X_FACE_SIZE, MPI_REAL, neighbors(D_EAST), TAG_X, &
                         buffer_rcv_x(1, 1), X_FACE_SIZE, MPI_REAL, neighbors(D_WEST), TAG_X, &
                         comm_cart, status, ierr)
       if (ierr /= MPI_SUCCESS) call domain%abort("ERROR: MPI: MPI_SendRecv failed...")
-      array(1, :, :) = buffer_rcv_x
+      if (neighbors(D_WEST) /= MPI_PROC_NULL) array(1, :, :) = buffer_rcv_x
 
       ! Exchange Y direction; I send North halo to North neighbour, I receive South halo from South Neighbour
-      buffer_send_y(:, :) = array(:, ny - 1, :)
+      if (neighbors(D_NORTH) /= MPI_PROC_NULL) buffer_send_y(:, :) = array(:, ny - 1, :)
       call MPI_Sendrecv(buffer_send_y(1, 1), Y_FACE_SIZE, MPI_REAL, neighbors(D_NORTH), TAG_Y, &
                         buffer_rcv_y(1, 1), Y_FACE_SIZE, MPI_REAL, neighbors(D_SOUTH), TAG_Y, &
                         comm_cart, status, ierr)
       if (ierr /= MPI_SUCCESS) call domain%abort("ERROR: MPI: MPI_SendRecv failed...")
-      array(:, 1, :) = buffer_rcv_y
+      if (neighbors(D_SOUTH) /= MPI_PROC_NULL) array(:, 1, :) = buffer_rcv_y
 
       ! Exchange Z direction; I send High halo to High neighbour, I receive Low halo from Low Neighbour
       call MPI_Sendrecv(array(1, 1, nz - 1), Z_FACE_SIZE, MPI_REAL, neighbors(D_HIGH), TAG_Z, &
@@ -81,20 +81,20 @@ contains
       if (ierr /= MPI_SUCCESS) call domain%abort("ERROR: MPI: MPI_SendRecv failed...")
 
       ! Exchange X direction; I send West halo to West neighbour, I receive East halo from East Neighbour
-      buffer_send_x(:, :) = array(2, :, :)
+      if (neighbors(D_WEST) /= MPI_PROC_NULL) buffer_send_x(:, :) = array(2, :, :)
       call MPI_Sendrecv(buffer_send_x(1, 1), X_FACE_SIZE, MPI_REAL, neighbors(D_WEST), TAG_X, &
                         buffer_rcv_x(1, 1), X_FACE_SIZE, MPI_REAL, neighbors(D_EAST), TAG_X, &
                         comm_cart, status, ierr)
       if (ierr /= MPI_SUCCESS) call domain%abort("ERROR: MPI: MPI_SendRecv failed...")
-      array(nx, :, :) = buffer_rcv_x
+      if (neighbors(D_EAST) /= MPI_PROC_NULL) array(nx, :, :) = buffer_rcv_x
 
       ! Exchange Y direction; I send South halo to South neighbour, I receive North halo from North Neighbour
-      buffer_send_y(:, :) = array(:, 2, :)
+      if (neighbors(D_SOUTH) /= MPI_PROC_NULL) buffer_send_y(:, :) = array(:, 2, :)
       call MPI_Sendrecv(buffer_send_y(1, 1), Y_FACE_SIZE, MPI_REAL, neighbors(D_SOUTH), TAG_Y, &
                         buffer_rcv_y(1, 1), Y_FACE_SIZE, MPI_REAL, neighbors(D_NORTH), TAG_Y, &
                         comm_cart, status, ierr)
       if (ierr /= MPI_SUCCESS) call domain%abort("ERROR: MPI: MPI_SendRecv failed...")
-      array(:, ny, :) = buffer_rcv_y
+      if (neighbors(D_NORTH) /= MPI_PROC_NULL) array(:, ny, :) = buffer_rcv_y
 
       ! Exchange Z direction; I send Low halo to Low neighbour, I receive High halo from High Neighbour
       call MPI_Sendrecv(array(1, 1, 2), Z_FACE_SIZE, MPI_REAL, neighbors(D_LOW), TAG_Z, &
@@ -128,20 +128,20 @@ contains
       comm_cart = domain%get_communicator()
 
       ! Exchange X direction; I send East halo to East neighbour, I receive West halo from West Neighbour
-      buffer_send_x(:, :) = array(nx - 1, :, :)
+      if (neighbors(D_EAST) /= MPI_PROC_NULL) buffer_send_x(:, :) = array(nx - 1, :, :)
       call MPI_Sendrecv(buffer_send_x(1, 1), X_FACE_SIZE, MPI_INTEGER, neighbors(D_EAST), TAG_X, &
                         buffer_rcv_x(1, 1), X_FACE_SIZE, MPI_INTEGER, neighbors(D_WEST), TAG_X, &
                         comm_cart, status, ierr)
       if (ierr /= MPI_SUCCESS) call domain%abort("ERROR: MPI: MPI_SendRecv failed...")
-      array(1, :, :) = buffer_rcv_x
+      if (neighbors(D_WEST) /= MPI_PROC_NULL) array(1, :, :) = buffer_rcv_x
 
       ! Exchange Y direction; I send North halo to North neighbour, I receive South halo from South Neighbour
-      buffer_send_y(:, :) = array(:, ny - 1, :)
+      if (neighbors(D_NORTH) /= MPI_PROC_NULL) buffer_send_y(:, :) = array(:, ny - 1, :)
       call MPI_Sendrecv(buffer_send_y(1, 1), Y_FACE_SIZE, MPI_INTEGER, neighbors(D_NORTH), TAG_Y, &
                         buffer_rcv_y(1, 1), Y_FACE_SIZE, MPI_INTEGER, neighbors(D_SOUTH), TAG_Y, &
                         comm_cart, status, ierr)
       if (ierr /= MPI_SUCCESS) call domain%abort("ERROR: MPI: MPI_SendRecv failed...")
-      array(:, 1, :) = buffer_rcv_y
+      if (neighbors(D_SOUTH) /= MPI_PROC_NULL) array(:, 1, :) = buffer_rcv_y
 
       ! Exchange Z direction; I send High halo to High neighbour, I receive Low halo from Low Neighbour
       call MPI_Sendrecv(array(1, 1, nz - 1), Z_FACE_SIZE, MPI_INTEGER, neighbors(D_HIGH), TAG_Z, &
@@ -150,20 +150,20 @@ contains
       if (ierr /= MPI_SUCCESS) call domain%abort("ERROR: MPI: MPI_SendRecv failed...")
 
       ! Exchange X direction; I send West halo to West neighbour, I receive East halo from East Neighbour
-      buffer_send_x(:, :) = array(2, :, :)
+      if (neighbors(D_WEST) /= MPI_PROC_NULL) buffer_send_x(:, :) = array(2, :, :)
       call MPI_Sendrecv(buffer_send_x(1, 1), X_FACE_SIZE, MPI_INTEGER, neighbors(D_WEST), TAG_X, &
                         buffer_rcv_x(1, 1), X_FACE_SIZE, MPI_INTEGER, neighbors(D_EAST), TAG_X, &
                         comm_cart, status, ierr)
       if (ierr /= MPI_SUCCESS) call domain%abort("ERROR: MPI: MPI_SendRecv failed...")
-      array(nx, :, :) = buffer_rcv_x
+      if (neighbors(D_EAST) /= MPI_PROC_NULL) array(nx, :, :) = buffer_rcv_x
 
       ! Exchange Y direction; I send South halo to South neighbour, I receive North halo from North Neighbour
-      buffer_send_y(:, :) = array(:, 2, :)
+      if (neighbors(D_SOUTH) /= MPI_PROC_NULL) buffer_send_y(:, :) = array(:, 2, :)
       call MPI_Sendrecv(buffer_send_y(1, 1), Y_FACE_SIZE, MPI_INTEGER, neighbors(D_SOUTH), TAG_Y, &
                         buffer_rcv_y(1, 1), Y_FACE_SIZE, MPI_INTEGER, neighbors(D_NORTH), TAG_Y, &
                         comm_cart, status, ierr)
       if (ierr /= MPI_SUCCESS) call domain%abort("ERROR: MPI: MPI_SendRecv failed...")
-      array(:, ny, :) = buffer_rcv_y
+      if (neighbors(D_NORTH) /= MPI_PROC_NULL) array(:, ny, :) = buffer_rcv_y
 
       ! Exchange Z direction; I send Low halo to Low neighbour, I receive High halo from High Neighbour
       call MPI_Sendrecv(array(1, 1, 2), Z_FACE_SIZE, MPI_INTEGER, neighbors(D_LOW), TAG_Z, &
