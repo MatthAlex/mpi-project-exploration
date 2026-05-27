@@ -64,36 +64,36 @@ contains
 
       ! 1. Get original communicator size
       call MPI_Comm_size(comm_parent, parent_size, ierr)
-      if (ierr /= MPI_SUCCESS) call self%abort("Error in Comm_size")
+      if (ierr /= MPI_SUCCESS) call self%abort("ERROR: MPI: Comm_size failed..")
 
       ! 2. Determine dimensions (MPI_Dims_create)
       ! Creates a division of cores in a Cartesian ndims-dimensional X(, Y(, Z)) grid
       self%ndims = 3 ! Assuming 3D for now
       self%dims = requested_dims
       call MPI_Dims_create(nnodes=parent_size, ndims=self%ndims, dims=self%dims, ierror=ierr)
-      if (ierr /= MPI_SUCCESS) call self%abort("Error creating dimensions")
+      if (ierr /= MPI_SUCCESS) call self%abort("ERROR: MPI: Dims_create failed..")
 
       ! Validate BC consistency - periodic must be symmetric per axis
       call validate_boundary_conditions(boundary_conditions, rc)
-      if (rc == -1) call self%abort("Invalid BC: X-axis periodic must be set on both West and East, or neither")
-      if (rc == -2) call self%abort("Invalid BC: Y-axis periodic must be set on both South and North, or neither")
-      if (rc == -3) call self%abort("Invalid BC: Z-axis periodic must be set on both Low and High, or neither")
+      if (rc == -1) call self%abort("ERROR: MPI: Invalid BC: X-axis periodic must be set on both West and East, or neither")
+      if (rc == -2) call self%abort("ERROR: MPI: Invalid BC: Y-axis periodic must be set on both South and North, or neither")
+      if (rc == -3) call self%abort("ERROR: MPI: Invalid BC: Z-axis periodic must be set on both Low and High, or neither")
 
       ! 3. Determine periodicity from inputs
       call self%set_periodicity(boundary_conditions)
 
       ! 4. Create Cartesian communicator
       call MPI_Cart_create(comm_parent, self%ndims, self%dims, self%periodic, self%reorder, self%comm, ierr)
-      if (ierr /= MPI_SUCCESS) call self%abort("Error creating Cartesian communicator")
+      if (ierr /= MPI_SUCCESS) call self%abort("ERROR: MPI: Cart_create failed..")
 
       ! 5. Get rank, size, and coordinates in the new communicator
       call MPI_Comm_rank(self%comm, self%rank, ierr)
-      if (ierr /= MPI_SUCCESS) call self%abort("Error deciding ranks in Cartesian")
+      if (ierr /= MPI_SUCCESS) call self%abort("ERROR: MPI: Comm_rank failed..")
       call MPI_Comm_size(self%comm, self%size, ierr)
-      if (ierr /= MPI_SUCCESS) call self%abort("Error in Comm_size")
+      if (ierr /= MPI_SUCCESS) call self%abort("ERROR: MPI: Comm_size failed..")
       if (self%size /= parent_size) print *, "Size mismatch between old and new communicators"
       call MPI_Cart_coords(self%comm, self%rank, self%ndims, self%coords, ierr)
-      if (ierr /= MPI_SUCCESS) call self%abort("Error getting cartesian coordinates")
+      if (ierr /= MPI_SUCCESS) call self%abort("ERROR: MPI: Cart_coords failed..")
 
       ! 6. Determine neighbors
       call self%determine_neighbors()
@@ -128,11 +128,11 @@ contains
       integer :: ierr, west, east, south, north, low, high
       ! Logic from original get_neighbors
       call MPI_Cart_shift(comm=self%comm, direction=X_DIR, disp=1, rank_source=west, rank_dest=east, ierror=ierr)
-      if (ierr /= MPI_SUCCESS) call self%abort("Error in Cartesian shift")
+      if (ierr /= MPI_SUCCESS) call self%abort("ERROR: MPI: Cart_shift failed..")
       call MPI_Cart_shift(comm=self%comm, direction=Y_DIR, disp=1, rank_source=south, rank_dest=north, ierror=ierr)
-      if (ierr /= MPI_SUCCESS) call self%abort("Error in Cartesian shift")
+      if (ierr /= MPI_SUCCESS) call self%abort("ERROR: MPI: Cart_shift failed..")
       call MPI_Cart_shift(comm=self%comm, direction=Z_DIR, disp=1, rank_source=low, rank_dest=high, ierror=ierr)
-      if (ierr /= MPI_SUCCESS) call self%abort("Error in Cartesian shift")
+      if (ierr /= MPI_SUCCESS) call self%abort("ERROR: MPI: Cart_shift failed..")
 
       self%neighbors = [west, east, south, north, low, high]
    end subroutine determine_neighbors
@@ -197,7 +197,7 @@ contains
       integer :: rank
       integer :: ierr
       call MPI_Cart_rank(self%comm, coords, rank, ierr)
-      if (ierr /= MPI_SUCCESS) call self%abort("Error in Cartesian shift")
+      if (ierr /= MPI_SUCCESS) call self%abort("ERROR: MPI: Cart_shift failed..")
    end function coords_to_rank
 
    !> Aborts the MPI processes cleanly
