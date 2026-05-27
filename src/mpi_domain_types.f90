@@ -91,7 +91,6 @@ contains
       if (ierr /= MPI_SUCCESS) call self%abort("ERROR: MPI: Comm_rank failed..")
       call MPI_Comm_size(self%comm, self%size, ierr)
       if (ierr /= MPI_SUCCESS) call self%abort("ERROR: MPI: Comm_size failed..")
-      if (self%size /= parent_size) print *, "Size mismatch between old and new communicators"
       call MPI_Cart_coords(self%comm, self%rank, self%ndims, self%coords, ierr)
       if (ierr /= MPI_SUCCESS) call self%abort("ERROR: MPI: Cart_coords failed..")
 
@@ -100,10 +99,6 @@ contains
 
       ! 7. Determine which faces are physical boundaries
       call self%check_physical_boundaries()
-
-      if (self%rank == 0) then
-         print *, "MPI Domain Initialized. Dimensions:", self%dims
-      end if
 
    end subroutine initialize_mpi_domain
 
