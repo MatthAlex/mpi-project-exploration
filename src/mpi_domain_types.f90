@@ -202,8 +202,10 @@ contains
       class(mpi_domain_t), intent(in) :: self
       character(len=*), intent(in) :: msg
       integer :: ierr
-      print *, msg
-      call MPI_Abort(self%get_communicator(), ierr)
+      ierr = 111 ! Interminent hotfix
+      ! TODO: change API to add errorcode passing for full fix
+      call self%log_message(msg)
+      call MPI_Abort(comm=self%get_communicator(), errorcode=ierr)
    end subroutine abort_mpi_processes
 
    subroutine domain_log_message(self, msg)
