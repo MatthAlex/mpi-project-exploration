@@ -15,6 +15,6 @@ program test_invalid_bc
    call domain%initialize([0, 0, 0], invalid_bc)
 
    ! Should never reach here
-   error stop "TEST FAILED: Invalid BC was not caught"
+   call domain%abort("TEST FAILED: Invalid BC was not caught")
 
 end program test_invalid_bc
