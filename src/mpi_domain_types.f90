@@ -125,7 +125,9 @@ contains
       integer :: ierr, west, east, south, north, low, high
       ! Logic from original get_neighbors
       call MPI_Cart_shift(comm=self%comm, direction=X_DIR, disp=1, rank_source=west, rank_dest=east, ierror=ierr)
+      if (ierr /= MPI_SUCCESS) call self%abort("Error in Cartesian shift")
       call MPI_Cart_shift(comm=self%comm, direction=Y_DIR, disp=1, rank_source=south, rank_dest=north, ierror=ierr)
+      if (ierr /= MPI_SUCCESS) call self%abort("Error in Cartesian shift")
       call MPI_Cart_shift(comm=self%comm, direction=Z_DIR, disp=1, rank_source=low, rank_dest=high, ierror=ierr)
       if (ierr /= MPI_SUCCESS) call self%abort("Error in Cartesian shift")
 
@@ -191,8 +193,8 @@ contains
       integer, intent(in) :: coords(3)
       integer :: rank
       integer :: ierr
-
       call MPI_Cart_rank(self%comm, coords, rank, ierr)
+      if (ierr /= MPI_SUCCESS) call self%abort("Error in Cartesian shift")
    end function coords_to_rank
 
    !> Aborts the MPI processes cleanly
