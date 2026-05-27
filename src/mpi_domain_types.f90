@@ -22,7 +22,6 @@ module mpi_domain_types
          !! Periodicity per dimension
       integer :: neighbors(6) = MPI_PROC_NULL
          !! Ranks of [W, E, S, N, L, H] neighbors
-      integer :: neighbors_extended(-1:1, -1:1, -1:1) = MPI_PROC_NULL
       logical :: reorder = .true.
          !! Core ranking may be reordered (`true`) or not (`false`)
       logical, public :: is_boundary_face(6) = .false.
@@ -40,8 +39,6 @@ module mpi_domain_types
       procedure, public :: get_periodicity => get_periodic_dims
       procedure, public :: coords_to_rank
       procedure, public :: abort => abort_mpi_processes
-      procedure, public :: determine_extended_neighbors
-      procedure, public :: test_extended_neighbors
 
       procedure, private :: determine_neighbors
       procedure, private :: set_periodicity
@@ -50,15 +47,6 @@ module mpi_domain_types
 
    end type mpi_domain_t
 
-   interface
-      module subroutine determine_extended_neighbors(self)
-         class(mpi_domain_t), intent(inout) :: self
-      end subroutine determine_extended_neighbors
-
-      module subroutine test_extended_neighbors(self)
-         class(mpi_domain_t), intent(in) :: self
-      end subroutine test_extended_neighbors
-   end interface
 contains
 
    !> Subroutine to initialize the type instance
