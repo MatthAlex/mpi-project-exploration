@@ -81,7 +81,7 @@ contains
          !! Source array to update boundary conditions
       integer, intent(in) :: bc_types(6)
          !! The boundary conditions for each face/direction
-      real(kind=sp), intent(in) :: dirichlet_values(6)
+      integer, intent(in) :: dirichlet_values(6)
       integer :: face
          !! Local loop variable - West, East, South, North, Low, High
 
@@ -98,7 +98,7 @@ contains
             ! This case technically shouldn't be reached if is_boundary_face is true.
             cycle
          case (DIRICHLET)
-            call apply_dirichlet_bc(domain, array, face, constant_value=int(dirichlet_values(face)))
+            call apply_dirichlet_bc(domain, array, face, constant_value=dirichlet_values(face))
          case (NEUMANN)
             call apply_neumann_bc(domain, array, face)
          end select
