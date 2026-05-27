@@ -58,9 +58,9 @@ contains
             ! This case technically shouldn't be reached if is_boundary_face is true.
             cycle
          case (DIRICHLET)
-            call apply_dirichlet_bc(domain, array, face, constant_value=dirichlet_values(face))
+            call apply_dirichlet_bc(array, face, constant_value=dirichlet_values(face))
          case (NEUMANN)
-            call apply_neumann_bc(domain, array, face)
+            call apply_neumann_bc(array, face)
          end select
       end do
 
@@ -98,17 +98,16 @@ contains
             ! This case technically shouldn't be reached if is_boundary_face is true.
             cycle
          case (DIRICHLET)
-            call apply_dirichlet_bc(domain, array, face, constant_value=dirichlet_values(face))
+            call apply_dirichlet_bc(array, face, constant_value=dirichlet_values(face))
          case (NEUMANN)
-            call apply_neumann_bc(domain, array, face)
+            call apply_neumann_bc(array, face)
          end select
       end do
 
    end subroutine update_boundary_conditions_int
 
    !> Applies a Dirichlet boundary condition by setting boundary cells to a constant.
-   pure subroutine apply_dirichlet_bc_real(domain, array, face, constant_value)
-      class(mpi_domain_t), intent(in) :: domain
+   pure subroutine apply_dirichlet_bc_real(array, face, constant_value)
       real(kind=sp), contiguous, intent(in out) :: array(:, :, :)
       integer, intent(in) :: face
       real(kind=sp), intent(in) :: constant_value
@@ -131,8 +130,7 @@ contains
    end subroutine apply_dirichlet_bc_real
 
       !> Applies a Dirichlet boundary condition by setting boundary cells to a constant.
-   pure subroutine apply_dirichlet_bc_int(domain, array, face, constant_value)
-      class(mpi_domain_t), intent(in) :: domain
+   pure subroutine apply_dirichlet_bc_int(array, face, constant_value)
       integer, contiguous, intent(in out) :: array(:, :, :)
       integer, intent(in) :: face
       integer, intent(in) :: constant_value
@@ -155,8 +153,7 @@ contains
    end subroutine apply_dirichlet_bc_int
 
    !> Applies a Neumann boundary by copying data from the adjacent interior cell.
-   pure subroutine apply_neumann_bc_real(domain, array, face)
-      class(mpi_domain_t), intent(in) :: domain
+   pure subroutine apply_neumann_bc_real(array, face)
       real(kind=sp), contiguous, intent(in out) :: array(:, :, :)
       integer, intent(in) :: face
 
@@ -171,8 +168,7 @@ contains
    end subroutine apply_neumann_bc_real
 
    !> Applies a Neumann boundary by copying data from the adjacent interior cell.
-   pure subroutine apply_neumann_bc_int(domain, array, face)
-      class(mpi_domain_t), intent(in) :: domain
+   pure subroutine apply_neumann_bc_int(array, face)
       integer, contiguous, intent(in out) :: array(:, :, :)
       integer, intent(in) :: face
 
