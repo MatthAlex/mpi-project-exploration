@@ -132,7 +132,7 @@ contains
       self%neighbors = [west, east, south, north, low, high]
    end subroutine determine_neighbors
 
-   module subroutine check_physical_boundaries(self)
+   pure module subroutine check_physical_boundaries(self)
       class(mpi_domain_t), intent(inout) :: self
       ! Logic from original determine_rank_boundaries
       self%is_boundary_face = .false.
@@ -180,7 +180,7 @@ contains
    end function get_domain_dims
 
    ! Add this to your mpi_domain_types module
-   module pure function get_periodic_dims(self) result(periodic_dims)
+   pure module function get_periodic_dims(self) result(periodic_dims)
       class(mpi_domain_t), intent(in) :: self
       logical :: periodic_dims(3)
       periodic_dims = self%periodic
