@@ -38,7 +38,7 @@ program test_simple_mpi_f08
    ! if (right >= size) right = 0
 
    ! Print information about this process
-   print '(3(a,1x,i0),1x,i0)', 'Hello from process ', rank, ' of ', size, ". My neighbours are:", left, right
+   print "(3(a,1x,i0),1x,i0)", "Hello from process ", rank, " of ", size, ". My neighbours are:", left, right
 
    ! Data to send is the rank of the current process
    sendval = rank
