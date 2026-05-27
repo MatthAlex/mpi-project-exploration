@@ -58,7 +58,7 @@ contains
                ! ...ask MPI what rank lives at these 0-based coordinates.
                coords_buffer = [i - 1, j - 1, k - 1]
                call MPI_Cart_rank(cart_comm, coords_buffer, PTop(i, j, k), ierr)
-               if (ierr /= MPI_SUCCESS) call mpi_domain%abort("Failed to build PTop array")
+               if (ierr /= MPI_SUCCESS) call mpi_domain%abort("ERROR: MPI: Failed to build PTop array, Cart_rank failed..")
             end do
          end do
       end do
