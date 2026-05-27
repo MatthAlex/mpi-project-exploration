@@ -211,7 +211,7 @@ contains
       character(len=*), intent(in) :: msg
       character(len=256) :: formatted_msg
 
-      write (formatted_msg, '(A,I0,A,A)') "[", self%rank, "] ", trim(msg)
+      write (formatted_msg, "(A,I0,A,A)") "[", self%rank, "] ", trim(msg)
       print *, trim(formatted_msg)
    end subroutine domain_log_message
 

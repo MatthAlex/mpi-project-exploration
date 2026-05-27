@@ -83,7 +83,7 @@ program test_sendrecv_3D
       call MPI_Barrier(comm=comm_cart, ierror=ierr)
    end do
    finish = MPI_WTime()
-   if (rank == 0) print '(A,1X,F8.2,A)', "MPI TIME:", finish - start, "s"
+   if (rank == 0) print "(A,1X,F8.2,A)", "MPI TIME:", finish - start, "s"
 
    ! Since the tests above pass
    if (rank == 0) print *, "Success!"
