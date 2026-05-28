@@ -1,4 +1,5 @@
 module mpi_domain_types
+   use lib_mpi_enums, only: X_DIR, Y_DIR, Z_DIR, D_WEST, D_EAST, D_SOUTH, D_NORTH, D_LOW, D_HIGH, PERIODIC
    use mpi_f08, only: MPI_Cart_coords, MPI_Cart_create, MPI_Cart_shift, MPI_Comm_rank, MPI_Comm_size, MPI_Dims_create, MPI_Cart_rank
    use mpi_f08, only: MPI_COMM_WORLD, MPI_SUCCESS, MPI_Comm, MPI_PROC_NULL, MPI_Abort
    implicit none(type, external)
@@ -110,7 +111,6 @@ contains
 
    !> Sets the periodic boundaries for the MPI Cartesian communicator, based on an array of boundary types.
    module subroutine set_periodicity(self, bc_types)
-      use lib_mpi_enums, only: X_DIR, Y_DIR, Z_DIR, D_WEST, D_EAST, D_SOUTH, D_NORTH, D_LOW, D_HIGH, PERIODIC
       class(mpi_domain_t), intent(inout) :: self
       integer, intent(in) :: bc_types(6)
 
@@ -124,7 +124,6 @@ contains
 
    !> Finds the ranks of the 6 nearest neighbors by shifting ±1 in X, Y, and Z.
    module subroutine determine_neighbors(self)
-      use lib_mpi_enums, only: X_DIR, Y_DIR, Z_DIR
       class(mpi_domain_t), intent(in out) :: self
       integer :: ierr, west, east, south, north, low, high
       ! Logic from original get_neighbors
@@ -219,9 +218,11 @@ contains
    end subroutine domain_log_message
 
    pure function validate_periodic_bcs_symmetric(bc_types) result(rc)
-      !! Validates whether periodic boundaries are applied to both directions along a single axis.
-      !! Assumes that the incoming boundary condition types are already validated for type.
-      use lib_mpi_enums, only: D_WEST, D_EAST, D_SOUTH, D_NORTH, D_LOW, D_HIGH, PERIODIC
+      !! - Validates whether periodic boundaries are applied to both directions along a single axis.
+      !! - Assumes that the incoming boundary condition types are already validated for type.
+      !! - Assumes the boundary condition injected is representative of the problem.
+      !! This means that `PERIODIC` boundary conditions can ONLY appear in faces included in this representative
+      !! `bc_types`, when other boundary conditions are considered.
       integer, intent(in) :: bc_types(6)
       integer :: rc
       rc = 0
