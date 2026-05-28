@@ -1,8 +1,12 @@
-# Fortran MPI Cartesian Library
+# `lib_mpi_cart`
 
-Exploring a simple MPI cartesian grid with halo region updates, `mpi_f08`, `havaita`, some clever encapsulation, and general project structure and architecture.
+A Modern Fortran MPI Cartesian grid library for 3D stencil boundary and halo updates. Built on `mpi_f08` with clean encapsulation, and a test suite (WIP).
 
-- [Specifications](#specifications)
+For a 3D stencil code you will need domain decomposition, halo exchange, and boundary conditions in addition to physics. This library handles all three so you don't have to. It gives you a clean, tested (soon(TM)) MPI Cartesian topology layer with `mpi_f08` bindings, module encapsulation, and a test suite. It is intended to use as a drop-in library, call three subroutines through a thin API layer, and get on with your science.
+
+- [Features](#features)
+- [Roadmap - Explorations](#roadmap---explorations)
+- [Quick start](#quick-start)
 - [Getting Started](#getting-started)
 - [Development Tools](#development-tools)
 - [Documentation](#documentation)
@@ -11,91 +15,111 @@ Exploring a simple MPI cartesian grid with halo region updates, `mpi_f08`, `hava
 - [License](#license)
 - [Appendix](#appendix)
 
-## Specifications
+## Features
 
-Key features implemented:
+- **3D Cartesian topology** with configurable dimensions and periodicity
+- **Automatic decomposition** via `MPI_Dims_create`
+- **Neighbor discovery** using `MPI_Cart_shift`
+- **Blocking halo exchange** with static transfer buffers for `real` and `integer` types
+- **Boundary conditions:** Periodic, Dirichlet, and Neumann, applied per face
+- **`mpi_f08` bindings** throughout for type safety
+- **Module implementations** for clean separation of interface and implementation
+- **Comprehensive test suite** including halo correctness, boundary condition validation, and invalid-configuration detection
 
-- MPI Cartesian Grid
-    - 3D topology with configurable dimensions and periodicity
-    - Automatic decomposition via `MPI_Dims_create`
-    - Neighbor discovery using `MPI_Cart_shift`
-- Halo Region Updates
-    - Blocking communication via `MPI_SendRecv`
-    - Static transfer buffers for real and integer types
-    - Interface-based type handling
-- Boundary Conditions
-    - Periodic (MPI-handled), Dirichlet, Neumann
-    - Integrated with MPI topology for domain boundaries
-    - Parameterized boundary types per face
+## Roadmap - Explorations
 
-### Future Improvements
+- Non-blocking halo exchange
+- Derived MPI datatypes for halo regions
+- Performance benchmarking suite
+- Distributed logging
 
-- Modern MPI Interface
-    - Migration to `mpi_f08` for improved type safety
-    - Enhanced error handling and propagation
-    - Fortran 2008 submodules for implementation hiding
-- Advanced Communication
-    - Non-blocking halo exchanges via `MPI_Isend`/`MPI_Irecv`
-    - One-sided communication options for boundaries
-    - Derived datatypes for halo regions
-- Development Infrastructure
-    - Parallel testing framework with `fpm`
-    - Distributed logging system
-    - Performance benchmarking suite
+## Quick start
+
+API showcase:
+
+```fortran
+program quickstart_api
+   use mpi_f08,          only: MPI_Init, MPI_Barrier, MPI_Finalize
+   use mpi_domain_types, only: mpi_domain_t
+   use lib_mpi_enums,    only: PERIODIC, NEUMANN, DIRICHLET
+   use mpi_halo,         only: update_mpi_halo
+   use boundary,         only: update_boundaries
+
+   type(mpi_domain_t)   :: domain
+   real, allocatable    :: array(:,:,:)
+   integer, allocatable :: array_int(:,:,:)
+   integer, parameter   :: bc_types(6) = [&
+                              PERIODIC,   PERIODIC, &
+                              NEUMANN,    NEUMANN,  &
+                              DIRICHLET,  DIRICHLET ]
+   integer, parameter   :: nx = 8, ny = 9, nz = 10
+
+   call MPI_init()
+
+   ! 1. Set up the Cartesian topology
+   call domain%initialize( &
+      requested_dims     =[0, 0, 0], &  ! let MPI decide the decomposition or supply your own decomposition
+      boundary_conditions=bc_types)
+
+   if (domain%get_rank() == 0) then
+      write(*,"(A,3I4)") "Initialized MPI domain with dims: ", domain%get_dims()
+      write(*,"(37X,A)") "W   E   S   N   L   H"
+   end if
+   call MPI_Barrier(domain%get_communicator())
+   write(*,"(A,I0,A,6I4)") "I'm rank ", domain%get_rank(), " and my neighbours are: ", domain%get_neighbors()
+
+   allocate(array(nx, ny, nz), source=1.0)
+   allocate(array_int(nx, ny, nz), source=1)
+
+   call update_mpi_halo(domain, array)
+   call update_boundaries( &
+      domain, array, bc_types, &
+      dirichlet_values = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0])
+
+   call update_mpi_halo(domain, array_int)
+   call update_boundaries( &
+      domain, array_int, bc_types, &
+      dirichlet_values = [1, 1, 1, 1, 1, 1])
+
+   call MPI_Finalize()
+end program quickstart_api
+```
 
 ## Getting Started
 
 ### Prerequisites
 
 - Linux OS or WSL2 via Windows
-- GFortran or oneAPI Fortran compiler
-- MPI/MPICH installation. Currently testing on OpenMPI v5.0.2
+- A Fortran compiler (GFortran or Intel oneAPI)
+- A modern MPI implementation (OpenMPI >= 5.0)
+- [fpm](https://github.com/fortran-lang/fpm) — the Fortran Package Manager
 
-#### Optional
+### Build and test
 
-- VS Code installation
-- Modern Fortran extension installation
+```sh
+fpm test [testname]     # Build and run named test
+fpm run sendrecv_3D     # Run the 3D halo + boundary integration test
+fpm run sendrecv_1D     # Run the 1D reference implementation
+```
 
-### Step-by-step instructions
+### Python tooling
 
-0. Load compiler modules (if using a compute cluster):
+Python virtual environments are used to drive build, run, and development tooling: `fpm`, `pre-commit`, `ford`. Use `venv` or `uv` to set up the environment, the following example only considers `venv`
 
-    ```sh
-    module load gcc openmpi
-    # or
-    module load intel intelmpi
-    ```
-
-1. Create and activate a Python environment:
-
-    ```sh
-    python3 -m venv .venv
-    source .venv/bin/activate  # Remember to activate your enviroment before runtime or development tasks.
-    ```
-
-2. Install the runtime and development packages:
-
-    ```sh
-    pip3 install .  # Install runtime dependencies from pyproject.toml
-    pip3 install .[dev]  # Install development dependencies
-    ```
-
-3. Run the tests and main program:
-
-    ```sh
-    fpm test  # by default it uses gcc/gfortran to compile and run
-    fpm run sendrecv_1D
-    ```
+```sh
+python3 -m venv .venv
+source .venv/bin/activate   # Remember to activate your enviroment before runtime or development tasks.
+pip3 install .              # Install runtime dependencies from pyproject.toml
+pip3 install .[dev]         # Install development dependencies
+```
 
 ## Development Tools
 
-The template includes preconfigured development tools and settings for Modern Fortran development, with optimized configurations for:
+The project preconfigures development tools and settings for Modern Fortran:
 
-- VS Code integration
-- Language server features
-- Code formatting
-- Automated testing
-- Package management
+- VS Code + Modern Fortran extension + `fortls` language server
+- Package management and automated testing with `fpm`
+- Local CI/CD with `pre-commit`
 
 For detailed setup instructions and tool configurations, see [TOOLING.md](./docs/TOOLING.md).
 
