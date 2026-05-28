@@ -56,11 +56,13 @@ contains
       integer, intent(in) :: boundary_conditions(6)
       type(MPI_Comm), intent(in), optional :: parent_comm
 
-      type(MPI_Comm) :: comm_parent
+      type(MPI_Comm) :: comm_parent, comm_cart
       integer :: ierr, parent_size, rc
 
       comm_parent = MPI_COMM_WORLD
       if (present(parent_comm)) comm_parent = parent_comm
+      ! Overload comm component here to avoid uninitialized access in the case of abort(). Then, we assign comm as usual
+      self%comm = comm_parent
 
       ! 1. Get original communicator size
       call MPI_Comm_size(comm_parent, parent_size, ierr)
@@ -83,8 +85,10 @@ contains
       call self%set_periodicity(boundary_conditions)
 
       ! 4. Create Cartesian communicator
-      call MPI_Cart_create(comm_parent, self%ndims, self%dims, self%periodic, self%reorder, self%comm, ierr)
+      call MPI_Cart_create(comm_parent, self%ndims, self%dims, self%periodic, self%reorder, comm_cart, ierr)
       if (ierr /= MPI_SUCCESS) call self%abort("ERROR: MPI: Cart_create failed..")
+
+      self%comm = comm_cart
 
       ! 5. Get rank, size, and coordinates in the new communicator
       call MPI_Comm_rank(self%comm, self%rank, ierr)
