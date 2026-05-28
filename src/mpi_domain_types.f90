@@ -4,6 +4,8 @@ module mpi_domain_types
    implicit none(type, external)
    private
 
+   integer, parameter :: ABORT_ERRORCODE = 111
+
    type, public :: mpi_domain_t
       private ! Make components private by default
       type(MPI_Comm) :: comm
@@ -196,18 +198,15 @@ contains
       integer :: rank
       integer :: ierr
       call MPI_Cart_rank(self%comm, coords, rank, ierr)
-      if (ierr /= MPI_SUCCESS) call self%abort("ERROR: MPI: Cart_shift failed..")
+      if (ierr /= MPI_SUCCESS) call self%abort("ERROR: MPI: Cart_rank failed..")
    end function coords_to_rank
 
    !> Aborts the MPI processes cleanly
    module subroutine abort_mpi_processes(self, msg)
       class(mpi_domain_t), intent(in) :: self
       character(len=*), intent(in) :: msg
-      integer :: ierr
-      ierr = 111 ! Interminent hotfix
-      ! TODO: change API to add errorcode passing for full fix
       call self%log_message(msg)
-      call MPI_Abort(comm=self%get_communicator(), errorcode=ierr)
+      call MPI_Abort(comm=self%comm, errorcode=ABORT_ERRORCODE)
    end subroutine abort_mpi_processes
 
    subroutine domain_log_message(self, msg)
