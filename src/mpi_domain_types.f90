@@ -6,10 +6,10 @@ module mpi_domain_types
    private
 
    integer, parameter :: ABORT_ERRORCODE = 111
-   !! Errorcode related to internal library failure.
+      !! Errorcode highlighting internal library failures.
 
    type, public :: mpi_domain_t
-      private ! Make components private by default
+      private
       type(MPI_Comm) :: comm
          !! Cartesian communicator
       integer :: rank = -1
@@ -27,11 +27,11 @@ module mpi_domain_types
       integer :: neighbors(6) = MPI_PROC_NULL
          !! Ranks of [W, E, S, N, L, H] neighbors
       logical :: reorder = .true.
-         !! Core ranking may be reordered (`true`) or not (`false`)
+         !! Allow MPI to reorder ranks for topology-aware placement (NUMA, socket affinity).
       logical, public :: is_boundary_face(6) = .false.
-         !! `True` if face is a physical boundary
+         !! `True` if face is a physical boundary. Public to avoid getter overhead in hot loops.
       logical, public :: is_interior = .true.
-         !! `True` if rank has no physical boundary faces
+         !! `True` if rank has no physical boundary faces. Public to avoid getter overhead in hot loops.
    contains
       procedure, public :: initialize => initialize_mpi_domain
       procedure, public :: get_communicator => get_domain_communicator
@@ -53,8 +53,17 @@ module mpi_domain_types
 
 contains
 
-   !> Subroutine to initialize the type instance
    module subroutine initialize_mpi_domain(self, requested_dims, boundary_conditions, parent_comm)
+      !! Initializes the MPI Cartesian domain instance.
+      !!
+      !! The initialization order matters:
+      !! 1. The parent communicator is seeded into `comm` immediately so that `abort()`
+      !!    works even if a later step fails.
+      !! 2. `MPI_Dims_create` resolves the core decomposition from the requested dims.
+      !! 3. Periodicity is derived from the boundary conditions and validated for
+      !!    per-axis symmetry before the Cartesian communicator is created.
+      !! 4. After communicator creation, rank metadata, neighbors, and physical
+      !!    boundary faces are determined.
       class(mpi_domain_t), intent(inout) :: self
       integer, intent(in) :: requested_dims(3)
       integer, intent(in) :: boundary_conditions(6)
@@ -65,36 +74,29 @@ contains
 
       comm_parent = MPI_COMM_WORLD
       if (present(parent_comm)) comm_parent = parent_comm
-      ! Overload comm component here to avoid uninitialized access in the case of abort(). Then, we assign comm as usual
       self%comm = comm_parent
 
-      ! 1. Get original communicator size
       call MPI_Comm_size(comm_parent, parent_size, ierr)
       if (ierr /= MPI_SUCCESS) call self%abort("ERROR: MPI: Comm_size failed..")
 
-      ! 2. Determine dimensions (MPI_Dims_create)
-      ! Creates a division of cores in a Cartesian ndims-dimensional X(, Y(, Z)) grid
-      self%ndims = 3 ! Assuming 3D for now
+      ! Decomposes cores in a Cartesian 3-dimensional X(, Y(, Z)) grid
+      self%ndims = 3 ! Hardcoded to 3D problems - extending it to 2D/1D not in scope
       self%dims = requested_dims
       call MPI_Dims_create(nnodes=parent_size, ndims=self%ndims, dims=self%dims, ierror=ierr)
       if (ierr /= MPI_SUCCESS) call self%abort("ERROR: MPI: Dims_create failed..")
 
-      ! Validate BC consistency - periodic must be symmetric per axis
       rc = validate_periodic_bcs_symmetric(boundary_conditions)
       if (rc == -1) call self%abort("ERROR: MPI: Invalid BC: X-axis periodic must be set on both West and East, or neither")
       if (rc == -2) call self%abort("ERROR: MPI: Invalid BC: Y-axis periodic must be set on both South and North, or neither")
       if (rc == -3) call self%abort("ERROR: MPI: Invalid BC: Z-axis periodic must be set on both Low and High, or neither")
 
-      ! 3. Determine periodicity from inputs
       call self%set_periodicity(boundary_conditions)
 
-      ! 4. Create Cartesian communicator
       call MPI_Cart_create(comm_parent, self%ndims, self%dims, self%periodic, self%reorder, comm_cart, ierr)
       if (ierr /= MPI_SUCCESS) call self%abort("ERROR: MPI: Cart_create failed..")
 
       self%comm = comm_cart
 
-      ! 5. Get rank, size, and coordinates in the new communicator
       call MPI_Comm_rank(self%comm, self%rank, ierr)
       if (ierr /= MPI_SUCCESS) call self%abort("ERROR: MPI: Comm_rank failed..")
       call MPI_Comm_size(self%comm, self%size, ierr)
@@ -102,16 +104,16 @@ contains
       call MPI_Cart_coords(self%comm, self%rank, self%ndims, self%coords, ierr)
       if (ierr /= MPI_SUCCESS) call self%abort("ERROR: MPI: Cart_coords failed..")
 
-      ! 6. Determine neighbors
       call self%determine_neighbors()
 
-      ! 7. Determine which faces are physical boundaries
       call self%check_physical_boundaries()
 
    end subroutine initialize_mpi_domain
 
-   !> Sets the periodic boundaries for the MPI Cartesian communicator, based on an array of boundary types.
    module subroutine set_periodicity(self, bc_types)
+      !! Derives per-axis periodicity from the six face boundary conditions by setting `self%periodic(3)`.
+      !! An axis is periodic only if both opposing faces are set to `PERIODIC`.
+      !! Note: `X_DIR`/`Y_DIR`/`Z_DIR` are 0-based (MPI convention); `periodic` is 1-based.
       class(mpi_domain_t), intent(inout) :: self
       integer, intent(in) :: bc_types(6)
 
@@ -123,11 +125,10 @@ contains
       self%periodic(Z_DIR + 1) = (bc_types(D_LOW) == PERIODIC .and. bc_types(D_HIGH) == PERIODIC)
    end subroutine set_periodicity
 
-   !> Finds the ranks of the 6 nearest neighbors by shifting ±1 in X, Y, and Z.
    module subroutine determine_neighbors(self)
+      !! Finds the ranks of the 6 nearest neighbors by shifting ±1 in X, Y, and Z. Populates `self%neighbors(6)`.
       class(mpi_domain_t), intent(in out) :: self
       integer :: ierr, west, east, south, north, low, high
-      ! Logic from original get_neighbors
       call MPI_Cart_shift(comm=self%comm, direction=X_DIR, disp=1, rank_source=west, rank_dest=east, ierror=ierr)
       if (ierr /= MPI_SUCCESS) call self%abort("ERROR: MPI: Cart_shift failed..")
       call MPI_Cart_shift(comm=self%comm, direction=Y_DIR, disp=1, rank_source=south, rank_dest=north, ierror=ierr)
@@ -139,8 +140,12 @@ contains
    end subroutine determine_neighbors
 
    pure module subroutine check_physical_boundaries(self)
+      !! Marks which faces are physical boundaries and whether this rank is fully interior.
+      !! A face is a physical boundary when its neighbor is `MPI_PROC_NULL`.
+      !! A rank is interior when none of its six faces are physical boundaries —
+      !! this is the fast path that skips boundary condition application entirely.
+      !! Populates `self%is_boundary_face` and `self%is_interior`.
       class(mpi_domain_t), intent(inout) :: self
-      ! Logic from original determine_rank_boundaries
       self%is_boundary_face = .false.
       where (self%neighbors == MPI_PROC_NULL)
          self%is_boundary_face = .true.
@@ -148,7 +153,6 @@ contains
       self%is_interior = .not. any(self%is_boundary_face)
    end subroutine check_physical_boundaries
 
-   ! --- Implement simple getter functions ---
    pure module function get_domain_communicator(self) result(comm)
       class(mpi_domain_t), intent(in) :: self
       type(MPI_Comm) :: comm
@@ -185,7 +189,6 @@ contains
       requested_dims = self%dims
    end function get_domain_dims
 
-   ! Add this to your mpi_domain_types module
    pure module function get_periodic_dims(self) result(periodic_dims)
       class(mpi_domain_t), intent(in) :: self
       logical :: periodic_dims(3)
@@ -201,8 +204,10 @@ contains
       if (ierr /= MPI_SUCCESS) call self%abort("ERROR: MPI: Cart_rank failed..")
    end function coords_to_rank
 
-   !> Aborts the MPI processes cleanly
    module subroutine abort_mpi_processes(self, msg, errorcode)
+      !! Logs a message and aborts all MPI processes.
+      !! Uses `ABORT_ERRORCODE` (111) by default; callers may pass a specific error code
+      !! via the optional `errorcode` argument for finer-grained diagnostics.
       class(mpi_domain_t), intent(in) :: self
       character(len=*), intent(in) :: msg
       integer, intent(in), optional :: errorcode
@@ -223,11 +228,8 @@ contains
    end subroutine domain_log_message
 
    pure function validate_periodic_bcs_symmetric(bc_types) result(rc)
-      !! - Validates whether periodic boundaries are applied to both directions along a single axis.
-      !! - Assumes that the incoming boundary condition types are already validated for type.
-      !! - Assumes the boundary condition injected is representative of the problem.
-      !! This means that `PERIODIC` boundary conditions can ONLY appear in faces included in this representative
-      !! `bc_types`, when other boundary conditions are considered.
+      !! Returns 0 if periodic BCs are symmetric per axis, or a negative axis code if not.
+      !! Only checks symmetry; does not validate that individual BC values are in range.
       integer, intent(in) :: bc_types(6)
       integer :: rc
       rc = 0
