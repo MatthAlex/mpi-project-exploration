@@ -6,6 +6,7 @@ module mpi_domain_types
    private
 
    integer, parameter :: ABORT_ERRORCODE = 111
+   !! Errorcode related to internal library failure.
 
    type, public :: mpi_domain_t
       private ! Make components private by default
@@ -201,11 +202,15 @@ contains
    end function coords_to_rank
 
    !> Aborts the MPI processes cleanly
-   module subroutine abort_mpi_processes(self, msg)
+   module subroutine abort_mpi_processes(self, msg, errorcode)
       class(mpi_domain_t), intent(in) :: self
       character(len=*), intent(in) :: msg
+      integer, intent(in), optional :: errorcode
+      integer :: errcode_
       call self%log_message(msg)
-      call MPI_Abort(comm=self%comm, errorcode=ABORT_ERRORCODE)
+      errcode_ = ABORT_ERRORCODE
+      if (present(errorcode)) errcode_ = errorcode
+      call MPI_Abort(comm=self%comm, errorcode=errcode_)
    end subroutine abort_mpi_processes
 
    subroutine domain_log_message(self, msg)
