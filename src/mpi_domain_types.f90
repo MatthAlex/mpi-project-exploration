@@ -78,7 +78,7 @@ contains
       if (ierr /= MPI_SUCCESS) call self%abort("ERROR: MPI: Dims_create failed..")
 
       ! Validate BC consistency - periodic must be symmetric per axis
-      call validate_boundary_conditions(boundary_conditions, rc)
+      rc = validate_periodic_bcs_symmetric(boundary_conditions)
       if (rc == -1) call self%abort("ERROR: MPI: Invalid BC: X-axis periodic must be set on both West and East, or neither")
       if (rc == -2) call self%abort("ERROR: MPI: Invalid BC: Y-axis periodic must be set on both South and North, or neither")
       if (rc == -3) call self%abort("ERROR: MPI: Invalid BC: Z-axis periodic must be set on both Low and High, or neither")
@@ -218,10 +218,12 @@ contains
       print *, trim(formatted_msg)
    end subroutine domain_log_message
 
-   subroutine validate_boundary_conditions(bc_types, rc)
+   pure function validate_periodic_bcs_symmetric(bc_types) result(rc)
+      !! Validates whether periodic boundaries are applied to both directions along a single axis.
+      !! Assumes that the incoming boundary condition types are already validated for type.
       use lib_mpi_enums, only: D_WEST, D_EAST, D_SOUTH, D_NORTH, D_LOW, D_HIGH, PERIODIC
       integer, intent(in) :: bc_types(6)
-      integer, intent(out) :: rc
+      integer :: rc
       rc = 0
 
       ! X-axis
@@ -242,5 +244,5 @@ contains
          return
       end if
 
-   end subroutine validate_boundary_conditions
+   end function validate_periodic_bcs_symmetric
 end module mpi_domain_types
