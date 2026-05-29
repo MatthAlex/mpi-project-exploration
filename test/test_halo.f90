@@ -7,11 +7,11 @@ module test_halo
    public :: check_halo_real, check_halo_integer
 contains
 
-   !! Check that all* values of each halo face are equal to the Neighbouring Rank for REAL array
-   !! Caveat: Corners and edges are excluded, as order of SendRecv may seed values to those points,
-   !! that don't belong to the actual neighbours.
-   !! Reminder: we only test the non-physical halo regions
    subroutine check_halo_real(domain, array)
+      !! Check that all* values of each halo face are equal to the Neighbouring Rank for REAL array
+      !! Caveat: Corners and edges are excluded, as order of SendRecv may seed values to those points,
+      !! that don't belong to the actual neighbours.
+      !! Reminder: we only test the non-physical halo regions
       class(mpi_domain_t), intent(in) :: domain
       real(kind=sp), dimension(:, :, :), intent(in) :: array
       integer :: neighbors(6)
@@ -20,7 +20,7 @@ contains
       neighbors = domain%get_neighbors()
       is_bc_face = domain%is_boundary_face(:)
 
-      do face = 1, 6
+      do face = D_WEST, D_HIGH
          if (is_bc_face(face)) cycle
 
          select case (face)
@@ -64,7 +64,7 @@ contains
       neighbors = domain%get_neighbors()
       is_bc_face = domain%is_boundary_face(:)
 
-      do face = 1, 6
+      do face = D_WEST, D_HIGH
          if (is_bc_face(face)) cycle
 
          select case (face)

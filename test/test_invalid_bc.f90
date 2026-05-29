@@ -5,10 +5,9 @@ program test_invalid_bc
    implicit none
 
    type(mpi_domain_t) :: domain
-   integer :: ierr
    integer :: invalid_bc(6)
 
-   call MPI_Init(ierror=ierr)
+   call MPI_Init()
 
    ! This should abort
    invalid_bc = [PERIODIC, DIRICHLET, DIRICHLET, DIRICHLET, DIRICHLET, DIRICHLET]
